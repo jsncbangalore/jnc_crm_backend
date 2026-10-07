@@ -1,0 +1,10 @@
+export type VisibilityLevel = 'all' | 'team' | 'own' | 'none';
+export type ModelName = 'Lead' | 'Company' | 'Contact' | 'Quotation' | 'Order' | 'Invoice' | 'Supplier' | 'Inventory' | 'Activity';
+export type RoleName = 'platform_super_admin' | 'tenant_admin' | 'admin' | 'sub_admin' | 'employee' | 'store_manager' | 'project_manager' | 'developer_lead' | 'developer';
+export type CustomerListScope = 'own' | 'company';
+export declare function getCustomerListScope(): CustomerListScope;
+export declare const VISIBILITY_TABLE_OWN: Record<RoleName, Record<ModelName, VisibilityLevel>>;
+export declare const VISIBILITY_TABLE_COMPANY: Record<RoleName, Record<ModelName, VisibilityLevel>>;
+export declare function getVisibilityTable(scopeMode?: CustomerListScope): Record<RoleName, Record<ModelName, VisibilityLevel>>;
+export declare const VISIBILITY_TABLE: Record<RoleName, Record<ModelName, VisibilityLevel>>;
+export declare function getVisibility(role: string, model: ModelName, scopeMode?: CustomerListScope): VisibilityLevel;

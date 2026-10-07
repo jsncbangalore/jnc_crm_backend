@@ -1,0 +1,675 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var UsersService_1;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UsersService = exports.UpdateUserDto = exports.CreateUserDto = void 0;
+exports.generateSecurePassword = generateSecurePassword;
+const common_1 = require("@nestjs/common");
+const prisma_service_1 = require("../prisma/prisma.service");
+const notifications_service_1 = require("../notifications/notifications.service");
+const audit_service_1 = require("../audit/audit.service");
+const tenant_util_1 = require("../common/tenant.util");
+const roles_1 = require("../auth/roles");
+const create_user_dto_1 = require("./dto/create-user.dto");
+Object.defineProperty(exports, "CreateUserDto", { enumerable: true, get: function () { return create_user_dto_1.CreateUserDto; } });
+const update_user_dto_1 = require("./dto/update-user.dto");
+Object.defineProperty(exports, "UpdateUserDto", { enumerable: true, get: function () { return update_user_dto_1.UpdateUserDto; } });
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+function generateSecurePassword(length = 14) {
+    const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const lower = 'abcdefghijkmnopqrstuvwxyz';
+    const digits = '23456789';
+    const special = '!@#$%^&*';
+    const all = upper + lower + digits + special;
+    let pass = '';
+    pass += upper[crypto.randomInt(0, upper.length)];
+    pass += lower[crypto.randomInt(0, lower.length)];
+    pass += digits[crypto.randomInt(0, digits.length)];
+    pass += special[crypto.randomInt(0, special.length)];
+    for (let i = pass.length; i < length; i++) {
+        pass += all[crypto.randomInt(0, all.length)];
+    }
+    const arr = pass.split('');
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = crypto.randomInt(0, i + 1);
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr.join('');
+}
+const ROLE_CODE_MAP = {
+    platform_super_admin: 'PSA',
+    tenant_admin: 'AD',
+    admin: 'ADM',
+    sub_admin: 'SUB',
+    project_manager: 'PM',
+    developer_lead: 'LEAD',
+    store_manager: 'STM',
+    finance: 'FIN',
+    accountant: 'ACC',
+    employee: 'EMP',
+    developer: 'DEV',
+    client: 'CLI',
+    customer: 'CUST',
+};
+let UsersService = UsersService_1 = class UsersService {
+    constructor(prisma, notificationsService, auditService) {
+        this.prisma = prisma;
+        this.notificationsService = notificationsService;
+        this.auditService = auditService;
+        this.logger = new common_1.Logger(UsersService_1.name);
+    }
+    generateTempPassword() {
+        return generateSecurePassword(14);
+    }
+    async generateEmployeeCode(tenantId, role, tx) {
+        const db = tx || this.prisma;
+        if (role === 'platform_super_admin') {
+            const users = await db.user.findMany({
+                where: { role: 'platform_super_admin' },
+                select: { employeeCode: true },
+            });
+            let maxSeq = 0;
+            for (const u of users) {
+                const match = u.employeeCode.match(/PSA-(\d+)$/);
+                if (match) {
+                    const num = parseInt(match[1], 10);
+                    if (!isNaN(num) && num > maxSeq)
+                        maxSeq = num;
+                }
+            }
+            return `PSA-${String(maxSeq + 1).padStart(3, '0')}`;
+        }
+        const tenant = tenantId
+            ? await db.tenant.findUnique({
+                where: { id: tenantId },
+                select: { code: true },
+            })
+            : null;
+        const tenantCode = (tenant?.code || 'JNC').toUpperCase();
+        const roleCode = ROLE_CODE_MAP[role] || 'EMP';
+        const prefix = `${tenantCode}-${roleCode}`;
+        const users = await db.user.findMany({
+            where: {
+                tenantId,
+                employeeCode: { startsWith: prefix },
+            },
+            select: { employeeCode: true },
+        });
+        let maxSeq = 0;
+        for (const u of users) {
+            const match = u.employeeCode.match(new RegExp(`^${prefix}-(\\d+)$`));
+            if (match) {
+                const num = parseInt(match[1], 10);
+                if (!isNaN(num) && num > maxSeq)
+                    maxSeq = num;
+            }
+        }
+        return `${prefix}-${String(maxSeq + 1).padStart(3, '0')}`;
+    }
+    async createUser(dto, creator) {
+        const emailClean = dto.email.trim().toLowerCase();
+        const isPlatform = (0, roles_1.isPlatformOwner)(creator);
+        if (dto.role === 'platform_super_admin') {
+            if (!isPlatform) {
+                throw new common_1.ForbiddenException('Only Platform Super Admins can create platform administrators.');
+            }
+            const existing = await this.prisma.user.findFirst({
+                where: { email: emailClean, deletedAt: null },
+            });
+            if (existing) {
+                throw new common_1.BadRequestException(`A user with email "${emailClean}" already exists.`);
+            }
+            const tempPassword = generateSecurePassword(14);
+            const passwordHash = await bcrypt.hash(tempPassword, 10);
+            let newUser = null;
+            for (let attempt = 0; attempt < 5; attempt++) {
+                try {
+                    const employeeCode = await this.generateEmployeeCode(null, 'platform_super_admin');
+                    newUser = await this.prisma.user.create({
+                        data: {
+                            tenantId: null,
+                            employeeCode,
+                            name: dto.name.trim(),
+                            email: emailClean,
+                            phone: dto.phone?.trim() || null,
+                            passwordHash,
+                            role: 'platform_super_admin',
+                            isActive: true,
+                            mustResetPassword: true,
+                            createdById: creator.id,
+                        },
+                        select: {
+                            id: true,
+                            tenantId: true,
+                            employeeCode: true,
+                            name: true,
+                            email: true,
+                            phone: true,
+                            role: true,
+                            isActive: true,
+                            mustResetPassword: true,
+                            lastLoginAt: true,
+                            createdAt: true,
+                        },
+                    });
+                    break;
+                }
+                catch (err) {
+                    if (err.code === 'P2002' && attempt < 4)
+                        continue;
+                    throw err;
+                }
+            }
+            return {
+                user: newUser,
+                tempPassword,
+                message: 'Platform administrator account created successfully.',
+            };
+        }
+        const creatorRank = roles_1.ROLE_RANKS[creator.role] || 0;
+        const targetRank = roles_1.ROLE_RANKS[dto.role] || 0;
+        if (targetRank >= creatorRank && !isPlatform) {
+            throw new common_1.ForbiddenException(`You cannot create a user with role "${dto.role}". Your role must be strictly higher in rank.`);
+        }
+        if (dto.role === 'tenant_admin' && !isPlatform) {
+            throw new common_1.ForbiddenException('Only Platform Super Admins can create Company Administrators (Tenant Admins).');
+        }
+        const tenantId = (0, tenant_util_1.requireTenantId)(creator);
+        const tenant = await this.prisma.tenant.findUnique({
+            where: { id: tenantId },
+            select: { maxUsers: true, name: true, code: true },
+        });
+        const currentUsersCount = await this.prisma.user.count({
+            where: { tenantId, deletedAt: null },
+        });
+        if (tenant && currentUsersCount >= tenant.maxUsers) {
+            throw new common_1.BadRequestException(`Company user license limit reached (${tenant.maxUsers} users). Upgrade plan to add more members.`);
+        }
+        const existing = await this.prisma.user.findFirst({
+            where: { tenantId, email: emailClean, deletedAt: null },
+        });
+        if (existing) {
+            throw new common_1.BadRequestException(`A user with email "${emailClean}" already exists in this company.`);
+        }
+        if (dto.teamId) {
+            const team = await this.prisma.team.findFirst({
+                where: { id: dto.teamId, tenantId },
+            });
+            if (!team) {
+                throw new common_1.BadRequestException('The selected team does not exist or does not belong to your organization.');
+            }
+        }
+        if (dto.warehouseId) {
+            const wh = await this.prisma.warehouse.findFirst({
+                where: { id: dto.warehouseId, tenantId, deletedAt: null },
+            });
+            if (!wh) {
+                throw new common_1.BadRequestException('The selected warehouse does not exist or does not belong to your organization.');
+            }
+        }
+        const tempPassword = generateSecurePassword(14);
+        const passwordHash = await bcrypt.hash(tempPassword, 10);
+        let newUser = null;
+        for (let attempt = 0; attempt < 5; attempt++) {
+            try {
+                const employeeCode = await this.generateEmployeeCode(tenantId, dto.role);
+                newUser = await this.prisma.user.create({
+                    data: {
+                        tenantId,
+                        employeeCode,
+                        name: dto.name.trim(),
+                        email: emailClean,
+                        phone: dto.phone?.trim() || null,
+                        passwordHash,
+                        role: dto.role,
+                        teamId: dto.teamId || null,
+                        warehouseId: dto.warehouseId || null,
+                        isActive: true,
+                        mustResetPassword: true,
+                        createdById: creator.id,
+                    },
+                    select: {
+                        id: true,
+                        tenantId: true,
+                        employeeCode: true,
+                        name: true,
+                        email: true,
+                        phone: true,
+                        role: true,
+                        teamId: true,
+                        teamRef: { select: { id: true, name: true, allowedPages: true } },
+                        warehouseId: true,
+                        isActive: true,
+                        mustResetPassword: true,
+                        lastLoginAt: true,
+                        createdAt: true,
+                    },
+                });
+                break;
+            }
+            catch (err) {
+                if (err.code === 'P2002' && attempt < 4)
+                    continue;
+                throw err;
+            }
+        }
+        try {
+            const branding = await this.notificationsService.getBranding(tenantId);
+            await this.notificationsService.sendEmail({
+                tenantId,
+                to: newUser.email,
+                subject: `Welcome to ${branding.companyDisplayName} - Your Login Credentials [${newUser.employeeCode}]`,
+                html: `
+          <h3>Welcome to ${branding.companyDisplayName}</h3>
+          <p>Dear ${newUser.name},</p>
+          <p>Your company workspace account has been created.</p>
+          <p><strong>Login Details:</strong></p>
+          <ul>
+            <li><strong>Company Code:</strong> <code>${tenant?.code || 'JNC'}</code></li>
+            <li><strong>Username / Employee Code:</strong> <code>${newUser.employeeCode}</code></li>
+            <li><strong>Temporary Password:</strong> <code>${tempPassword}</code></li>
+          </ul>
+          <p><em>Note: You will be prompted to set your password upon first login.</em></p>
+        `,
+                relatedEntityType: 'user',
+                relatedEntityId: newUser.id,
+            });
+        }
+        catch (emailErr) {
+            this.logger.warn(`Could not dispatch welcome email for ${newUser.employeeCode}: ${emailErr.message}`);
+        }
+        await this.auditService.log({
+            tenantId,
+            actorId: creator.id,
+            actorName: creator.employeeCode,
+            action: 'CREATE',
+            entityName: 'User',
+            entityId: newUser.id,
+            afterState: { employeeCode: newUser.employeeCode, email: newUser.email, role: newUser.role },
+        });
+        return {
+            user: newUser,
+            tempPassword,
+            message: `User ${newUser.name} [${newUser.employeeCode}] created successfully.`,
+        };
+    }
+    async findAll(creator, query) {
+        const isPlatform = (0, roles_1.isPlatformOwner)(creator);
+        const where = { deletedAt: null };
+        if (!isPlatform) {
+            where.tenantId = (0, tenant_util_1.requireTenantId)(creator);
+        }
+        else {
+            if (query?.role === 'platform_super_admin') {
+                where.role = 'platform_super_admin';
+            }
+        }
+        if (query?.search) {
+            where.AND = [
+                {
+                    OR: [
+                        { name: { contains: query.search, mode: 'insensitive' } },
+                        { email: { contains: query.search, mode: 'insensitive' } },
+                        { employeeCode: { contains: query.search, mode: 'insensitive' } },
+                        { phone: { contains: query.search, mode: 'insensitive' } },
+                    ],
+                },
+            ];
+        }
+        if (query?.role) {
+            where.role = query.role;
+        }
+        if (query?.isActive !== undefined && query?.isActive !== '') {
+            where.isActive = query.isActive === 'true';
+        }
+        const items = await this.prisma.user.findMany({
+            where,
+            orderBy: { createdAt: 'asc' },
+            select: {
+                id: true,
+                tenantId: true,
+                employeeCode: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                teamId: true,
+                teamRef: { select: { id: true, name: true, allowedPages: true } },
+                warehouseId: true,
+                isActive: true,
+                mustResetPassword: true,
+                lastLoginAt: true,
+                createdAt: true,
+            },
+        });
+        return { items, total: items.length };
+    }
+    async findOne(id, creator) {
+        const isPlatform = (0, roles_1.isPlatformOwner)(creator);
+        const where = isPlatform
+            ? { id, deletedAt: null }
+            : { id, tenantId: (0, tenant_util_1.requireTenantId)(creator), deletedAt: null };
+        const user = await this.prisma.user.findFirst({
+            where,
+            select: {
+                id: true,
+                tenantId: true,
+                employeeCode: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                teamId: true,
+                teamRef: { select: { id: true, name: true, allowedPages: true } },
+                warehouseId: true,
+                isActive: true,
+                mustResetPassword: true,
+                lastLoginAt: true,
+                createdAt: true,
+            },
+        });
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        return user;
+    }
+    async updateUser(id, dto, modifier) {
+        const isPlatform = (0, roles_1.isPlatformOwner)(modifier);
+        const where = isPlatform
+            ? { id, deletedAt: null }
+            : { id, tenantId: (0, tenant_util_1.requireTenantId)(modifier), deletedAt: null };
+        const user = await this.prisma.user.findFirst({ where });
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        if (user.id === modifier.id && dto.role && dto.role !== modifier.role) {
+            throw new common_1.BadRequestException('You cannot change your own role.');
+        }
+        if (!isPlatform && user.id !== modifier.id) {
+            const modifierRank = roles_1.ROLE_RANKS[modifier.role] || 0;
+            const targetRank = roles_1.ROLE_RANKS[user.role] || 0;
+            if (targetRank >= modifierRank) {
+                throw new common_1.ForbiddenException('You cannot modify a user with an equal or higher role rank.');
+            }
+        }
+        if (dto.role) {
+            const newRank = roles_1.ROLE_RANKS[dto.role] || 0;
+            const modifierRank = roles_1.ROLE_RANKS[modifier.role] || 0;
+            if (newRank >= modifierRank && !isPlatform) {
+                throw new common_1.ForbiddenException(`You do not have permission to assign role "${dto.role}".`);
+            }
+            if (dto.role === 'tenant_admin' && !isPlatform) {
+                throw new common_1.ForbiddenException('Only Platform Super Admins can assign the Company Administrator role.');
+            }
+        }
+        if (user.role === 'tenant_admin' && user.tenantId) {
+            const isDemoting = dto.role && dto.role !== 'tenant_admin';
+            const isDeactivating = dto.isActive === false && user.isActive;
+            if (isDemoting || isDeactivating) {
+                const activeAdminsCount = await this.prisma.user.count({
+                    where: { tenantId: user.tenantId, role: 'tenant_admin', isActive: true, deletedAt: null },
+                });
+                if (activeAdminsCount <= 1) {
+                    throw new common_1.BadRequestException('Cannot demote or deactivate the last active Company Administrator of this company.');
+                }
+            }
+        }
+        if (dto.email) {
+            const cleanEmail = dto.email.trim().toLowerCase();
+            if (cleanEmail !== user.email) {
+                const duplicate = await this.prisma.user.findFirst({
+                    where: {
+                        tenantId: user.tenantId,
+                        email: cleanEmail,
+                        deletedAt: null,
+                        NOT: { id: user.id },
+                    },
+                });
+                if (duplicate) {
+                    throw new common_1.BadRequestException(`Email "${cleanEmail}" is already in use.`);
+                }
+            }
+        }
+        const targetTenantId = user.tenantId;
+        if (dto.teamId && targetTenantId) {
+            const team = await this.prisma.team.findFirst({
+                where: { id: dto.teamId, tenantId: targetTenantId },
+            });
+            if (!team) {
+                throw new common_1.BadRequestException('The selected team does not belong to this organization.');
+            }
+        }
+        if (dto.warehouseId && targetTenantId) {
+            const wh = await this.prisma.warehouse.findFirst({
+                where: { id: dto.warehouseId, tenantId: targetTenantId, deletedAt: null },
+            });
+            if (!wh) {
+                throw new common_1.BadRequestException('The selected warehouse does not belong to this organization.');
+            }
+        }
+        const deactivating = dto.isActive === false && user.isActive;
+        const updated = await this.prisma.user.update({
+            where: { id },
+            data: {
+                name: dto.name?.trim(),
+                email: dto.email ? dto.email.trim().toLowerCase() : undefined,
+                phone: dto.phone?.trim(),
+                role: dto.role,
+                teamId: dto.teamId !== undefined ? dto.teamId : undefined,
+                warehouseId: dto.warehouseId !== undefined ? dto.warehouseId : undefined,
+                isActive: dto.isActive !== undefined ? dto.isActive : undefined,
+                tokenVersion: deactivating ? { increment: 1 } : undefined,
+            },
+            select: {
+                id: true,
+                tenantId: true,
+                employeeCode: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                teamId: true,
+                teamRef: { select: { id: true, name: true, allowedPages: true } },
+                warehouseId: true,
+                isActive: true,
+                mustResetPassword: true,
+                lastLoginAt: true,
+                createdAt: true,
+            },
+        });
+        await this.auditService.log({
+            tenantId: user.tenantId || (0, tenant_util_1.requireTenantId)(modifier),
+            actorId: modifier.id,
+            actorName: modifier.employeeCode,
+            action: 'UPDATE',
+            entityName: 'User',
+            entityId: user.id,
+            afterState: dto,
+        });
+        return updated;
+    }
+    async resetCredentials(id, modifier) {
+        const isPlatform = (0, roles_1.isPlatformOwner)(modifier);
+        const where = isPlatform
+            ? { id, deletedAt: null }
+            : { id, tenantId: (0, tenant_util_1.requireTenantId)(modifier), deletedAt: null };
+        const user = await this.prisma.user.findFirst({ where });
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        if (!isPlatform && user.id !== modifier.id) {
+            const modifierRank = roles_1.ROLE_RANKS[modifier.role] || 0;
+            const targetRank = roles_1.ROLE_RANKS[user.role] || 0;
+            if (targetRank >= modifierRank) {
+                throw new common_1.ForbiddenException('You cannot reset credentials for a user with an equal or higher role rank.');
+            }
+        }
+        const tempPassword = generateSecurePassword(14);
+        const passwordHash = await bcrypt.hash(tempPassword, 10);
+        await this.prisma.user.update({
+            where: { id },
+            data: {
+                passwordHash,
+                mustResetPassword: true,
+                failedLoginAttempts: 0,
+                lockoutUntil: null,
+                tokenVersion: { increment: 1 },
+            },
+        });
+        const lockKeys = [user.email.toLowerCase(), user.employeeCode];
+        if (user.tenantId) {
+            lockKeys.push(`${user.email.toLowerCase()}:${user.tenantId}`);
+            lockKeys.push(`${user.employeeCode}:${user.tenantId}`);
+        }
+        await this.prisma.accountLockout.deleteMany({
+            where: { identityKey: { in: lockKeys } },
+        });
+        try {
+            const tenant = user.tenantId
+                ? await this.prisma.tenant.findUnique({
+                    where: { id: user.tenantId },
+                    select: { name: true, code: true },
+                })
+                : null;
+            const branding = await this.notificationsService.getBranding(user.tenantId || undefined);
+            await this.notificationsService.sendEmail({
+                tenantId: user.tenantId || 'JNC',
+                to: user.email,
+                subject: `[${branding.companyDisplayName}] Your Credentials Have Been Reset`,
+                html: `
+          <h3>Credentials Reset</h3>
+          <p>Hello ${user.name},</p>
+          <p>Your password for ${branding.companyDisplayName} has been reset by an administrator.</p>
+          <p><strong>Your Temporary Credentials:</strong></p>
+          <ul>
+            <li><strong>Company Code:</strong> <code>${tenant?.code || 'JNC'}</code></li>
+            <li><strong>Employee Code:</strong> <code>${user.employeeCode}</code></li>
+            <li><strong>New Temporary Password:</strong> <code>${tempPassword}</code></li>
+          </ul>
+          <p>You will be required to change your password immediately upon login.</p>
+        `,
+                relatedEntityType: 'user',
+                relatedEntityId: user.id,
+            });
+        }
+        catch (err) {
+            this.logger.warn(`Could not send password reset email to ${user.email}: ${err.message}`);
+        }
+        await this.auditService.log({
+            tenantId: user.tenantId || (0, tenant_util_1.requireTenantId)(modifier),
+            actorId: modifier.id,
+            actorName: modifier.employeeCode,
+            action: 'RESET_PASSWORD',
+            entityName: 'User',
+            entityId: user.id,
+            afterState: { email: user.email, employeeCode: user.employeeCode },
+        });
+        return {
+            message: `Password reset successfully for ${user.name}`,
+            tempPassword,
+        };
+    }
+    async toggleActive(id, modifier) {
+        const isPlatform = (0, roles_1.isPlatformOwner)(modifier);
+        const where = isPlatform
+            ? { id, deletedAt: null }
+            : { id, tenantId: (0, tenant_util_1.requireTenantId)(modifier), deletedAt: null };
+        const user = await this.prisma.user.findFirst({ where });
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        if (user.id === modifier.id) {
+            throw new common_1.BadRequestException('You cannot deactivate your own account.');
+        }
+        if (!isPlatform) {
+            const modifierRank = roles_1.ROLE_RANKS[modifier.role] || 0;
+            const targetRank = roles_1.ROLE_RANKS[user.role] || 0;
+            if (targetRank >= modifierRank) {
+                throw new common_1.ForbiddenException('You cannot change status for a user with an equal or higher role rank.');
+            }
+        }
+        if (user.role === 'tenant_admin' && user.isActive && user.tenantId) {
+            const activeAdminsCount = await this.prisma.user.count({
+                where: { tenantId: user.tenantId, role: 'tenant_admin', isActive: true, deletedAt: null },
+            });
+            if (activeAdminsCount <= 1) {
+                throw new common_1.BadRequestException('Cannot deactivate the last active Company Administrator of this company.');
+            }
+        }
+        const nextActive = !user.isActive;
+        const updated = await this.prisma.user.update({
+            where: { id },
+            data: {
+                isActive: nextActive,
+                tokenVersion: nextActive ? undefined : { increment: 1 },
+            },
+        });
+        await this.auditService.log({
+            tenantId: user.tenantId || (0, tenant_util_1.requireTenantId)(modifier),
+            actorId: modifier.id,
+            actorName: modifier.employeeCode,
+            action: nextActive ? 'ACTIVATE' : 'DEACTIVATE',
+            entityName: 'User',
+            entityId: user.id,
+            afterState: { isActive: nextActive },
+        });
+        return { id: updated.id, isActive: updated.isActive };
+    }
+    async deleteUser(id, modifier) {
+        const isPlatform = (0, roles_1.isPlatformOwner)(modifier);
+        const where = isPlatform
+            ? { id, deletedAt: null }
+            : { id, tenantId: (0, tenant_util_1.requireTenantId)(modifier), deletedAt: null };
+        const user = await this.prisma.user.findFirst({ where });
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        if (user.id === modifier.id) {
+            throw new common_1.BadRequestException('You cannot delete your own account.');
+        }
+        if (!isPlatform) {
+            const modifierRank = roles_1.ROLE_RANKS[modifier.role] || 0;
+            const targetRank = roles_1.ROLE_RANKS[user.role] || 0;
+            if (targetRank >= modifierRank) {
+                throw new common_1.ForbiddenException('You cannot delete a user with an equal or higher role rank.');
+            }
+        }
+        if (user.role === 'tenant_admin' && user.tenantId) {
+            const activeAdminsCount = await this.prisma.user.count({
+                where: { tenantId: user.tenantId, role: 'tenant_admin', isActive: true, deletedAt: null },
+            });
+            if (activeAdminsCount <= 1) {
+                throw new common_1.BadRequestException('Cannot delete the last active Company Administrator of this company.');
+            }
+        }
+        await this.prisma.user.update({
+            where: { id },
+            data: {
+                deletedAt: new Date(),
+                isActive: false,
+                tokenVersion: { increment: 1 },
+            },
+        });
+        await this.auditService.log({
+            tenantId: user.tenantId || (0, tenant_util_1.requireTenantId)(modifier),
+            actorId: modifier.id,
+            actorName: modifier.employeeCode,
+            action: 'DELETE',
+            entityName: 'User',
+            entityId: user.id,
+            afterState: { deletedAt: new Date() },
+        });
+        return { message: `User ${user.name} removed successfully.` };
+    }
+};
+exports.UsersService = UsersService;
+exports.UsersService = UsersService = UsersService_1 = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        notifications_service_1.NotificationsService,
+        audit_service_1.AuditService])
+], UsersService);
