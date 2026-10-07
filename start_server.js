@@ -30,5 +30,49 @@ if (fs.existsSync(envPath)) {
   }
 }
 
+// Sanitize PostgreSQL connection strings if passwords contain raw '@'
+function sanitizeDatabaseUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  try {
+    const protocolMatch = url.match(/^([a-z]+:\/\/)(.*)$/i);
+    if (!protocolMatch) return url;
+    const protocol = protocolMatch[1];
+    const rest = protocolMatch[2];
+    const lastAt = rest.lastIndexOf('@');
+    if (lastAt === -1) return url;
+    const auth = rest.substring(0, lastAt);
+    const hostAndRest = rest.substring(lastAt + 1);
+    const firstColon = auth.indexOf(':');
+    if (firstColon === -1) return url;
+    const user = auth.substring(0, firstColon);
+    const pass = auth.substring(firstColon + 1);
+    const encodedPass = encodeURIComponent(decodeURIComponent(pass));
+    return `${protocol}${user}:${encodedPass}@${hostAndRest}`;
+  } catch (e) {
+    return url;
+  }
+}
+
+if (process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = sanitizeDatabaseUrl(process.env.DATABASE_URL);
+}
+if (process.env.DIRECT_URL) {
+  process.env.DIRECT_URL = sanitizeDatabaseUrl(process.env.DIRECT_URL);
+}
+
+// Global exception and rejection loggers for clear production diagnostics
+process.on('uncaughtException', (err) => {
+  console.error('\n❌ FATAL UNCAUGHT EXCEPTION:');
+  console.error(err && err.stack ? err.stack : err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('\n❌ FATAL UNHANDLED REJECTION:');
+  console.error(reason && reason.stack ? reason.stack : reason);
+  process.exit(1);
+});
+
 // Require the compiled NestJS entry point
 require('./dist/main.js');
+
