@@ -5,7 +5,8 @@
   "description": "JNC CRM API - Standalone Hostinger Web App Deployment Bundle",
   "scripts": {
     "start": "node start_server.js",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed:user": "node create_user.js"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.3",
