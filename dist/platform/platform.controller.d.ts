@@ -12,19 +12,19 @@ export declare class PlatformController {
             orders: number;
             invoices: number;
         };
-        email: string | null;
-        name: string;
-        phone: string | null;
         id: string;
+        name: string;
+        email: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         code: string;
         slug: string;
+        webhookKeyHash: string | null;
         status: string;
         planTier: string;
         maxUsers: number;
         logoUrl: string | null;
+        phone: string | null;
         address: string | null;
         city: string | null;
         state: string | null;
@@ -48,11 +48,28 @@ export declare class PlatformController {
         stampUrl: string | null;
         isOnboarded: boolean;
         isInternal: boolean;
-        webhookKeyHash: string | null;
+        deletedAt: Date | null;
         scheduledDeletionDate: Date | null;
         deletionConfirmToken: string | null;
     }[]>;
     getTenant(id: string): Promise<{
+        users: {
+            id: string;
+            name: string;
+            email: string;
+            isActive: boolean;
+            employeeCode: string;
+            role: string;
+            lastLoginAt: Date;
+        }[];
+        mailAccounts: {
+            id: string;
+            name: string;
+            email: string;
+            smtpHost: string;
+            purpose: string;
+            isActive: boolean;
+        }[];
         _count: {
             leads: number;
             skus: number;
@@ -60,37 +77,20 @@ export declare class PlatformController {
             invoices: number;
             projects: number;
         };
-        users: {
-            email: string;
-            name: string;
-            id: string;
-            employeeCode: string;
-            role: string;
-            isActive: boolean;
-            lastLoginAt: Date;
-        }[];
-        mailAccounts: {
-            email: string;
-            name: string;
-            id: string;
-            isActive: boolean;
-            purpose: string;
-            smtpHost: string;
-        }[];
     } & {
-        email: string | null;
-        name: string;
-        phone: string | null;
         id: string;
+        name: string;
+        email: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         code: string;
         slug: string;
+        webhookKeyHash: string | null;
         status: string;
         planTier: string;
         maxUsers: number;
         logoUrl: string | null;
+        phone: string | null;
         address: string | null;
         city: string | null;
         state: string | null;
@@ -114,7 +114,7 @@ export declare class PlatformController {
         stampUrl: string | null;
         isOnboarded: boolean;
         isInternal: boolean;
-        webhookKeyHash: string | null;
+        deletedAt: Date | null;
         scheduledDeletionDate: Date | null;
         deletionConfirmToken: string | null;
     }>;
@@ -123,19 +123,19 @@ export declare class PlatformController {
         emailDispatched: boolean;
         emailStatusMessage: string;
         tenant: {
-            email: string | null;
-            name: string;
-            phone: string | null;
             id: string;
+            name: string;
+            email: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             code: string;
             slug: string;
+            webhookKeyHash: string | null;
             status: string;
             planTier: string;
             maxUsers: number;
             logoUrl: string | null;
+            phone: string | null;
             address: string | null;
             city: string | null;
             state: string | null;
@@ -159,7 +159,7 @@ export declare class PlatformController {
             stampUrl: string | null;
             isOnboarded: boolean;
             isInternal: boolean;
-            webhookKeyHash: string | null;
+            deletedAt: Date | null;
             scheduledDeletionDate: Date | null;
             deletionConfirmToken: string | null;
         };
@@ -173,19 +173,19 @@ export declare class PlatformController {
         };
     }>;
     updateTenant(id: string, dto: UpdateTenantDto): Promise<{
-        email: string | null;
-        name: string;
-        phone: string | null;
         id: string;
+        name: string;
+        email: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         code: string;
         slug: string;
+        webhookKeyHash: string | null;
         status: string;
         planTier: string;
         maxUsers: number;
         logoUrl: string | null;
+        phone: string | null;
         address: string | null;
         city: string | null;
         state: string | null;
@@ -209,7 +209,7 @@ export declare class PlatformController {
         stampUrl: string | null;
         isOnboarded: boolean;
         isInternal: boolean;
-        webhookKeyHash: string | null;
+        deletedAt: Date | null;
         scheduledDeletionDate: Date | null;
         deletionConfirmToken: string | null;
     }>;
@@ -264,47 +264,82 @@ export declare class PlatformController {
         };
         tempPassword: string;
     }>;
+    listTenantUsers(id: string): Promise<{
+        id: string;
+        name: string;
+        email: string;
+        isActive: boolean;
+        createdAt: Date;
+        phone: string;
+        employeeCode: string;
+        role: string;
+        lastLoginAt: Date;
+    }[]>;
+    addTenantUser(id: string, dto: {
+        name: string;
+        email: string;
+        phone?: string;
+        role?: string;
+        employeeCode?: string;
+        password?: string;
+    }): Promise<{
+        message: string;
+        user: {
+            id: string;
+            name: string;
+            email: string;
+            isActive: boolean;
+            createdAt: Date;
+            phone: string;
+            employeeCode: string;
+            role: string;
+        };
+        tempPassword: string;
+    }>;
+    deleteTenantUser(id: string, userId: string): Promise<{
+        message: string;
+    }>;
 }
 export declare class PlatformAdminsController {
     private readonly platformService;
     constructor(platformService: PlatformService);
     listPlatformAdmins(): Promise<{
-        email: string;
-        name: string;
-        phone: string;
         id: string;
+        name: string;
+        email: string;
+        isActive: boolean;
+        createdAt: Date;
+        phone: string;
         employeeCode: string;
         role: string;
-        isActive: boolean;
         mustResetPassword: boolean;
         lastLoginAt: Date;
-        createdAt: Date;
     }[]>;
     createPlatformAdmin(dto: CreatePlatformAdminDto, actor: any): Promise<{
         message: string;
         user: {
-            email: string;
-            name: string;
-            phone: string;
             id: string;
+            name: string;
+            email: string;
+            isActive: boolean;
+            createdAt: Date;
+            phone: string;
             employeeCode: string;
             role: string;
-            isActive: boolean;
             mustResetPassword: boolean;
-            createdAt: Date;
         };
         tempPassword: string;
     }>;
     toggleActive(id: string, body: TogglePlatformAdminActiveDto): Promise<{
         message: string;
         user: {
-            email: string;
-            name: string;
-            phone: string;
             id: string;
+            name: string;
+            email: string;
+            isActive: boolean;
+            phone: string;
             employeeCode: string;
             role: string;
-            isActive: boolean;
         };
     }>;
     resetPassword(id: string): Promise<{
@@ -312,26 +347,29 @@ export declare class PlatformAdminsController {
         tempPassword: string;
         user: {
             team: string | null;
-            email: string;
-            name: string;
-            phone: string | null;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string;
+            isActive: boolean;
+            createdById: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            phone: string | null;
+            deletedAt: Date | null;
             employeeCode: string;
             passwordHash: string;
             role: string;
             teamId: string | null;
             warehouseId: string | null;
-            isActive: boolean;
             mustResetPassword: boolean;
             lastLoginAt: Date | null;
             failedLoginAttempts: number;
             lockoutUntil: Date | null;
             tokenVersion: number;
-            createdById: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
         };
+    }>;
+    deletePlatformAdmin(id: string): Promise<{
+        message: string;
     }>;
 }

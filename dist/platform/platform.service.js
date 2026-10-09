@@ -161,7 +161,8 @@ let PlatformService = class PlatformService {
         let emailDispatched = false;
         let emailStatusMessage = 'Email not requested';
         if (dto.sendEmail !== false) {
-            const loginUrl = dto.appUrl || process.env.APP_URL || 'http://localhost:5173/login';
+            const baseFrontendUrl = (process.env.FRONTEND_URL || dto?.appUrl || process.env.APP_URL || 'https://admin.jsnc.co.in').replace(/\/$/, '');
+            const loginUrl = `${baseFrontendUrl}/login`;
             const emailHtml = `
 <!DOCTYPE html>
 <html>
@@ -465,7 +466,8 @@ let PlatformService = class PlatformService {
         let emailDispatched = false;
         let emailStatusMessage = 'Email not requested';
         if (dto?.sendEmail !== false) {
-            const loginUrl = dto?.appUrl || process.env.APP_URL || 'http://localhost:5173/login';
+            const baseFrontendUrl = (process.env.FRONTEND_URL || dto?.appUrl || process.env.APP_URL || 'https://admin.jsnc.co.in').replace(/\/$/, '');
+            const loginUrl = `${baseFrontendUrl}/login`;
             const emailHtml = `
 <!DOCTYPE html>
 <html>
@@ -576,7 +578,6 @@ let PlatformService = class PlatformService {
     async listPlatformAdmins() {
         return this.prisma.user.findMany({
             where: {
-                role: 'platform_super_admin',
                 tenantId: null,
                 deletedAt: null,
             },
@@ -604,7 +605,7 @@ let PlatformService = class PlatformService {
             throw new common_1.ConflictException(`User with email '${cleanEmail}' already exists`);
         }
         const count = await this.prisma.user.count({
-            where: { role: 'platform_super_admin', tenantId: null },
+            where: { tenantId: null },
         });
         const employeeCode = `PSA-${String(count + 1).padStart(3, '0')}`;
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%^&*()_+';
@@ -613,13 +614,14 @@ let PlatformService = class PlatformService {
             tempPassword += chars.charAt(crypto.randomInt(0, chars.length));
         }
         const passwordHash = await bcrypt.hash(tempPassword, 10);
+        const newUserRole = (dto.role?.trim() || 'platform_super_admin');
         const newUser = await this.prisma.user.create({
             data: {
                 name: dto.name.trim(),
                 email: cleanEmail,
                 phone: dto.phone?.trim() || null,
                 employeeCode,
-                role: 'platform_super_admin',
+                role: newUserRole,
                 tenantId: null,
                 passwordHash,
                 isActive: true,
@@ -704,6 +706,111 @@ let PlatformService = class PlatformService {
             tempPassword,
             user: target,
         };
+    }
+    async deletePlatformAdmin(id) {
+        const target = await this.prisma.user.findFirst({
+            where: { id, role: 'platform_super_admin', tenantId: null },
+        });
+        if (!target)
+            throw new common_1.NotFoundException('Platform administrator not found');
+        const totalAdmins = await this.prisma.user.count({
+            where: { role: 'platform_super_admin', tenantId: null, deletedAt: null },
+        });
+        if (totalAdmins <= 1) {
+            throw new common_1.BadRequestException('Cannot delete the last remaining Platform Administrator.');
+        }
+        await this.prisma.user.delete({ where: { id } }).catch(async () => {
+            await this.prisma.user.update({
+                where: { id },
+                data: { deletedAt: new Date(), isActive: false },
+            });
+        });
+        return { message: `Platform administrator ${target.name} (${target.email}) deleted successfully.` };
+    }
+    async listTenantUsers(tenantId) {
+        const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+        if (!tenant)
+            throw new common_1.NotFoundException('Client company workspace not found');
+        return this.prisma.user.findMany({
+            where: { tenantId, deletedAt: null },
+            orderBy: { createdAt: 'asc' },
+            select: {
+                id: true,
+                employeeCode: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                isActive: true,
+                createdAt: true,
+                lastLoginAt: true,
+            },
+        });
+    }
+    async addTenantUser(tenantId, dto) {
+        const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+        if (!tenant)
+            throw new common_1.NotFoundException('Client company workspace not found');
+        const cleanEmail = dto.email.trim().toLowerCase();
+        const existing = await this.prisma.user.findFirst({
+            where: { tenantId, email: cleanEmail, deletedAt: null },
+        });
+        if (existing) {
+            throw new common_1.ConflictException(`A user with email '${cleanEmail}' already exists in this company.`);
+        }
+        const totalUsers = await this.prisma.user.count({
+            where: { tenantId, deletedAt: null },
+        });
+        if (tenant.maxUsers && totalUsers >= tenant.maxUsers) {
+            throw new common_1.BadRequestException(`Maximum user seat limit (${tenant.maxUsers}) reached for ${tenant.name}.`);
+        }
+        const count = totalUsers + 1;
+        const userRole = dto.role || 'employee';
+        const empCode = dto.employeeCode?.trim() || `${tenant.code}-EMP-${String(count).padStart(3, '0')}`;
+        const rawPass = dto.password || 'Jsnc@2024jsn';
+        const passwordHash = await bcrypt.hash(rawPass, 10);
+        const newUser = await this.prisma.user.create({
+            data: {
+                tenantId,
+                employeeCode: empCode,
+                name: dto.name.trim(),
+                email: cleanEmail,
+                phone: dto.phone?.trim() || null,
+                passwordHash,
+                role: userRole,
+                isActive: true,
+                mustResetPassword: true,
+            },
+            select: {
+                id: true,
+                employeeCode: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                isActive: true,
+                createdAt: true,
+            },
+        });
+        return {
+            message: `User ${newUser.name} added to ${tenant.name} successfully`,
+            user: newUser,
+            tempPassword: rawPass,
+        };
+    }
+    async deleteTenantUser(tenantId, userId) {
+        const user = await this.prisma.user.findFirst({
+            where: { id: userId, tenantId, deletedAt: null },
+        });
+        if (!user)
+            throw new common_1.NotFoundException('User account not found in this company workspace');
+        await this.prisma.user.delete({ where: { id: userId } }).catch(async () => {
+            await this.prisma.user.update({
+                where: { id: userId },
+                data: { deletedAt: new Date(), isActive: false },
+            });
+        });
+        return { message: `User ${user.name} removed from company successfully.` };
     }
 };
 exports.PlatformService = PlatformService;

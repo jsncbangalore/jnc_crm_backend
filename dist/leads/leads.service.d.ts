@@ -15,25 +15,25 @@ export declare class LeadsService {
     getNextAssigneeId(tenantId: string): Promise<string | null>;
     createLead(dto: CreateLeadDto, actor?: ScopedUser): Promise<{
         company: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             address: string | null;
             city: string | null;
             state: string | null;
             website: string | null;
             gstin: string | null;
+            deletedAt: Date | null;
             industry: string | null;
             billingEmail: string | null;
         };
         assignedTo: {
-            email: string;
-            name: string;
             id: string;
+            name: string;
+            email: string;
             employeeCode: string;
         };
     } & {
@@ -42,9 +42,9 @@ export declare class LeadsService {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
         city: string | null;
+        deletedAt: Date | null;
         leadNumber: string;
         source: string;
         companyId: string | null;
@@ -82,45 +82,44 @@ export declare class LeadsService {
     }): Promise<{
         items: ({
             company: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
                 address: string | null;
                 city: string | null;
                 state: string | null;
                 website: string | null;
                 gstin: string | null;
+                deletedAt: Date | null;
                 industry: string | null;
                 billingEmail: string | null;
             };
             contact: {
-                email: string | null;
-                name: string;
-                phone: string;
                 id: string;
                 tenantId: string | null;
+                name: string;
+                email: string | null;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                phone: string;
                 deletedAt: Date | null;
                 companyId: string | null;
                 designation: string | null;
                 isPrimary: boolean;
             };
             assignedTo: {
-                email: string;
-                name: string;
                 id: string;
+                name: string;
+                email: string;
                 employeeCode: string;
             };
             activities: {
                 id: string;
                 createdAt: Date;
-                userId: string | null;
                 type: string;
                 title: string;
                 description: string | null;
@@ -128,6 +127,7 @@ export declare class LeadsService {
                 completedAt: Date | null;
                 isCompleted: boolean;
                 leadId: string;
+                userId: string | null;
             }[];
         } & {
             id: string;
@@ -135,9 +135,9 @@ export declare class LeadsService {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
             city: string | null;
+            deletedAt: Date | null;
             leadNumber: string;
             source: string;
             companyId: string | null;
@@ -164,30 +164,30 @@ export declare class LeadsService {
     }>;
     findOne(id: string, user: ScopedUser): Promise<{
         company: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             address: string | null;
             city: string | null;
             state: string | null;
             website: string | null;
             gstin: string | null;
+            deletedAt: Date | null;
             industry: string | null;
             billingEmail: string | null;
         };
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -196,9 +196,9 @@ export declare class LeadsService {
         quotations: ({
             lines: ({
                 sku: {
-                    name: string;
                     id: string;
                     tenantId: string;
+                    name: string;
                     createdAt: Date;
                     updatedAt: Date;
                     deletedAt: Date | null;
@@ -231,8 +231,8 @@ export declare class LeadsService {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             leadId: string | null;
             contactId: string | null;
             quoteNumber: string;
@@ -245,21 +245,20 @@ export declare class LeadsService {
             terms: string | null;
         })[];
         assignedTo: {
-            email: string;
-            name: string;
             id: string;
+            name: string;
+            email: string;
             employeeCode: string;
         };
         activities: ({
             performedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
             id: string;
             createdAt: Date;
-            userId: string | null;
             type: string;
             title: string;
             description: string | null;
@@ -267,6 +266,7 @@ export declare class LeadsService {
             completedAt: Date | null;
             isCompleted: boolean;
             leadId: string;
+            userId: string | null;
         })[];
     } & {
         id: string;
@@ -274,9 +274,9 @@ export declare class LeadsService {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
         city: string | null;
+        deletedAt: Date | null;
         leadNumber: string;
         source: string;
         companyId: string | null;
@@ -298,30 +298,30 @@ export declare class LeadsService {
     }>;
     updateStatus(id: string, dto: UpdateLeadStatusDto, user: ScopedUser): Promise<{
         company: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             address: string | null;
             city: string | null;
             state: string | null;
             website: string | null;
             gstin: string | null;
+            deletedAt: Date | null;
             industry: string | null;
             billingEmail: string | null;
         };
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -330,9 +330,9 @@ export declare class LeadsService {
         quotations: ({
             lines: ({
                 sku: {
-                    name: string;
                     id: string;
                     tenantId: string;
+                    name: string;
                     createdAt: Date;
                     updatedAt: Date;
                     deletedAt: Date | null;
@@ -365,8 +365,8 @@ export declare class LeadsService {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             leadId: string | null;
             contactId: string | null;
             quoteNumber: string;
@@ -379,21 +379,20 @@ export declare class LeadsService {
             terms: string | null;
         })[];
         assignedTo: {
-            email: string;
-            name: string;
             id: string;
+            name: string;
+            email: string;
             employeeCode: string;
         };
         activities: ({
             performedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
             id: string;
             createdAt: Date;
-            userId: string | null;
             type: string;
             title: string;
             description: string | null;
@@ -401,6 +400,7 @@ export declare class LeadsService {
             completedAt: Date | null;
             isCompleted: boolean;
             leadId: string;
+            userId: string | null;
         })[];
     } & {
         id: string;
@@ -408,9 +408,9 @@ export declare class LeadsService {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
         city: string | null;
+        deletedAt: Date | null;
         leadNumber: string;
         source: string;
         companyId: string | null;
@@ -434,14 +434,13 @@ export declare class LeadsService {
         sendEmailToCustomer?: boolean;
     }, user: ScopedUser): Promise<{
         performedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
     } & {
         id: string;
         createdAt: Date;
-        userId: string | null;
         type: string;
         title: string;
         description: string | null;
@@ -449,6 +448,7 @@ export declare class LeadsService {
         completedAt: Date | null;
         isCompleted: boolean;
         leadId: string;
+        userId: string | null;
     }>;
     commitImport(records: any[], user: ScopedUser): Promise<{
         totalRows: number;
@@ -460,8 +460,8 @@ export declare class LeadsService {
         id: string;
         tenantId: string;
         createdAt: Date;
-        userId: string;
         leadId: string;
+        userId: string;
         sharedById: string | null;
     }>;
 }

@@ -24,6 +24,7 @@ let InventoryService = class InventoryService {
         this.scopingService = scopingService;
         this.auditService = auditService;
         this.backupService = backupService;
+        this.lastClearAllTimestampPerTenant = new Map();
     }
     async getStockLevels(user, query) {
         this.scopingService.getInventoryScope(user);
@@ -1498,8 +1499,30 @@ let InventoryService = class InventoryService {
             },
         };
     }
-    async clearAllInventory(user) {
+    async clearAllInventory(confirmMessage, user) {
         const tenantId = (0, tenant_util_1.requireTenantId)(user);
+        const tenant = await this.prisma.tenant.findUnique({
+            where: { id: tenantId },
+            select: { id: true, code: true },
+        });
+        if (!tenant)
+            throw new common_1.NotFoundException('Tenant organization not found.');
+        const expectedConfirm = `DELETE ALL INVENTORY OF ${tenant.code.toUpperCase()}`;
+        if (!confirmMessage || confirmMessage.trim() !== expectedConfirm) {
+            throw new common_1.BadRequestException(`Confirmation message invalid. Body must equal: {"confirm": "${expectedConfirm}"}`);
+        }
+        const latestAuditLog = await this.prisma.auditLog.findFirst({
+            where: { tenantId, action: 'INVENTORY_CLEAR_ALL' },
+            orderBy: { timestamp: 'desc' },
+        });
+        if (latestAuditLog && latestAuditLog.timestamp) {
+            const lastClearedTime = new Date(latestAuditLog.timestamp).getTime();
+            const elapsedMs = Date.now() - lastClearedTime;
+            if (elapsedMs < 3600000) {
+                const remainingMins = Math.ceil((3600000 - elapsedMs) / 60000);
+                throw new common_1.HttpException(`Clear all inventory rate limited. Maximum 1 call per hour per company. Try again in ${remainingMins} minutes.`, common_1.HttpStatus.TOO_MANY_REQUESTS);
+            }
+        }
         await this.backupService.createBackup(user);
         await this.prisma.projectStockPosition.deleteMany({ where: { tenantId } });
         await this.prisma.stockTransfer.deleteMany({ where: { tenantId } });
@@ -1539,9 +1562,20 @@ let InventoryService = class InventoryService {
                 deletedAt: new Date(),
             },
         });
+        await this.prisma.auditLog.create({
+            data: {
+                tenantId,
+                actorId: user.id,
+                actorName: user?.name || user.employeeCode || 'Administrator',
+                action: 'INVENTORY_CLEAR_ALL',
+                entityName: 'Inventory',
+                entityId: tenantId,
+                afterState: JSON.stringify({ confirmMessage, clearedAt: new Date().toISOString() }),
+            },
+        }).catch(() => { });
         return {
             success: true,
-            message: 'All inventory data cleared fresh. Inventory is now completely empty and ready for fresh entries.',
+            message: `All inventory data for company ${tenant.code} cleared fresh.`,
         };
     }
     getPurchaseBillsFilePath() {

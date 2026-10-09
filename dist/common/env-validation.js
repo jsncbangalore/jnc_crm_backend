@@ -185,6 +185,9 @@ function validateEnvironment(env = process.env, options = {}) {
             if (!['http:', 'https:'].includes(parsed.protocol)) {
                 invalidVariables.push(`FRONTEND_URL must use http or https protocol (received: '${env.FRONTEND_URL}').`);
             }
+            if (isProduction && !env.FRONTEND_URL.toLowerCase().startsWith('https://')) {
+                invalidVariables.push(`FRONTEND_URL must use https:// protocol in production mode (received: '${env.FRONTEND_URL}').`);
+            }
         }
         catch {
             invalidVariables.push(`FRONTEND_URL is not a valid URL: '${env.FRONTEND_URL}'.`);
@@ -197,15 +200,26 @@ function validateEnvironment(env = process.env, options = {}) {
             invalidVariables.push("Wildcard origin '*' in ALLOWED_ORIGINS is prohibited in production mode.");
         }
     }
+    if (env.SMTP_FROM) {
+        warnings.push('SMTP_FROM is deprecated. Use EMAIL_FROM as the canonical environment variable.');
+        if (!env.EMAIL_FROM) {
+            process.env.EMAIL_FROM = env.SMTP_FROM;
+        }
+    }
+    if (isProduction && process.env.COOKIE_SECURE === 'false') {
+        warnings.push('COOKIE_SECURE=false is ignored in production mode. Secure flag is strictly enforced.');
+        delete process.env.COOKIE_SECURE;
+    }
     if (env.SMTP_PORT) {
         const p = parseInt(env.SMTP_PORT, 10);
         if (isNaN(p) || p <= 0 || p > 65535) {
             invalidVariables.push(`SMTP_PORT must be a valid integer port between 1 and 65535 (received: '${env.SMTP_PORT}').`);
         }
     }
-    if (env.EMAIL_FROM) {
-        if (!env.EMAIL_FROM.includes('@')) {
-            invalidVariables.push(`EMAIL_FROM must be a valid email address (received: '${env.EMAIL_FROM}').`);
+    if (env.EMAIL_FROM || process.env.EMAIL_FROM) {
+        const targetEmail = env.EMAIL_FROM || process.env.EMAIL_FROM;
+        if (!targetEmail || !targetEmail.includes('@')) {
+            invalidVariables.push(`EMAIL_FROM must be a valid email address (received: '${targetEmail}').`);
         }
     }
     if (env.TRUST_PROXY !== undefined && env.TRUST_PROXY !== '') {

@@ -9,8 +9,8 @@ export declare class NotificationsController {
         items: {
             id: string;
             tenantId: string;
-            status: string;
             subject: string | null;
+            status: string;
             channel: string;
             recipient: string;
             body: string;

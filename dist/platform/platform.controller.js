@@ -46,6 +46,15 @@ let PlatformController = class PlatformController {
     async resetTenantAdminPassword(id, dto) {
         return this.platformService.resetTenantAdminPassword(id, dto);
     }
+    async listTenantUsers(id) {
+        return this.platformService.listTenantUsers(id);
+    }
+    async addTenantUser(id, dto) {
+        return this.platformService.addTenantUser(id, dto);
+    }
+    async deleteTenantUser(id, userId) {
+        return this.platformService.deleteTenantUser(id, userId);
+    }
 };
 exports.PlatformController = PlatformController;
 __decorate([
@@ -101,6 +110,30 @@ __decorate([
     __metadata("design:paramtypes", [String, platform_admin_dto_1.ResetTenantAdminPasswordDto]),
     __metadata("design:returntype", Promise)
 ], PlatformController.prototype, "resetTenantAdminPassword", null);
+__decorate([
+    (0, common_1.Get)(':id/users'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PlatformController.prototype, "listTenantUsers", null);
+__decorate([
+    (0, common_1.Post)(':id/users'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PlatformController.prototype, "addTenantUser", null);
+__decorate([
+    (0, common_1.Delete)(':id/users/:userId'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], PlatformController.prototype, "deleteTenantUser", null);
 exports.PlatformController = PlatformController = __decorate([
     (0, common_1.Controller)('platform/tenants'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
@@ -122,6 +155,9 @@ let PlatformAdminsController = class PlatformAdminsController {
     }
     async resetPassword(id) {
         return this.platformService.resetPlatformAdminUserPassword(id);
+    }
+    async deletePlatformAdmin(id) {
+        return this.platformService.deletePlatformAdmin(id);
     }
 };
 exports.PlatformAdminsController = PlatformAdminsController;
@@ -155,6 +191,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PlatformAdminsController.prototype, "resetPassword", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PlatformAdminsController.prototype, "deletePlatformAdmin", null);
 exports.PlatformAdminsController = PlatformAdminsController = __decorate([
     (0, common_1.Controller)('platform/admins'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),

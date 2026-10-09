@@ -14,9 +14,9 @@ export declare class AutomationController {
             ruleId: string;
         }[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
@@ -43,9 +43,9 @@ export declare class AutomationController {
             ruleId: string;
         }[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
@@ -77,9 +77,9 @@ export declare class AutomationController {
             ruleId: string;
         }[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
@@ -111,9 +111,9 @@ export declare class AutomationController {
             ruleId: string;
         }[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
@@ -133,9 +133,9 @@ export declare class AutomationController {
             ruleId: string;
         }[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;

@@ -7,44 +7,44 @@ export declare class UsersController {
     constructor(usersService: UsersService);
     findAll(user: ScopedUser, search?: string, role?: string, isActive?: string): Promise<{
         items: {
-            email: string;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string;
+            name: string;
+            email: string;
+            isActive: boolean;
+            createdAt: Date;
+            phone: string;
             employeeCode: string;
             role: string;
             teamId: string;
             warehouseId: string;
-            isActive: boolean;
             mustResetPassword: boolean;
             lastLoginAt: Date;
-            createdAt: Date;
             teamRef: {
-                name: string;
                 id: string;
+                name: string;
                 allowedPages: string;
             };
         }[];
         total: number;
     }>;
     findOne(user: ScopedUser, id: string): Promise<{
-        email: string;
-        name: string;
-        phone: string;
         id: string;
         tenantId: string;
+        name: string;
+        email: string;
+        isActive: boolean;
+        createdAt: Date;
+        phone: string;
         employeeCode: string;
         role: string;
         teamId: string;
         warehouseId: string;
-        isActive: boolean;
         mustResetPassword: boolean;
         lastLoginAt: Date;
-        createdAt: Date;
         teamRef: {
-            name: string;
             id: string;
+            name: string;
             allowedPages: string;
         };
     }>;
@@ -54,22 +54,22 @@ export declare class UsersController {
         message: string;
     }>;
     updateUser(user: ScopedUser, id: string, dto: UpdateUserDto): Promise<{
-        email: string;
-        name: string;
-        phone: string;
         id: string;
         tenantId: string;
+        name: string;
+        email: string;
+        isActive: boolean;
+        createdAt: Date;
+        phone: string;
         employeeCode: string;
         role: string;
         teamId: string;
         warehouseId: string;
-        isActive: boolean;
         mustResetPassword: boolean;
         lastLoginAt: Date;
-        createdAt: Date;
         teamRef: {
-            name: string;
             id: string;
+            name: string;
             allowedPages: string;
         };
     }>;

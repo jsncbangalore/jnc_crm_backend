@@ -5,9 +5,9 @@ export declare class AuditController {
     getLogs(page?: number, limit?: number, entityName?: string, actorId?: string, search?: string): Promise<{
         items: ({
             actor: {
-                email: string;
-                name: string;
                 id: string;
+                name: string;
+                email: string;
                 employeeCode: string;
             };
         } & {

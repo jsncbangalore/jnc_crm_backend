@@ -1,15 +1,17 @@
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { LoginDto, SelectCompanyDto, PlatformLoginDto, ForgotPasswordDto, ResetPasswordDto } from './dto/login.dto';
 export declare function formatAuthUser(user: any): any;
 export declare class AuthService {
     private prisma;
     private jwtService;
+    private notificationsService?;
     private readonly MAX_FAILED_ATTEMPTS;
     private readonly LOCKOUT_DURATION_MS;
     private readonly PLATFORM_MAX_ATTEMPTS;
     private readonly PLATFORM_WINDOW_MS;
-    constructor(prisma: PrismaService, jwtService: JwtService);
+    constructor(prisma: PrismaService, jwtService: JwtService, notificationsService?: NotificationsService);
     private checkAccountLockout;
     private recordFailedAttempt;
     private resetFailedAttempts;
@@ -74,29 +76,29 @@ export declare class AuthService {
         phone?: string;
     }): Promise<{
         tenant: {
-            name: string;
             id: string;
+            name: string;
             code: string;
             slug: string;
             status: string;
             logoUrl: string;
             currency: string;
         };
-        email: string;
-        name: string;
-        phone: string;
         id: string;
         tenantId: string;
+        name: string;
+        email: string;
+        isActive: boolean;
+        createdAt: Date;
+        phone: string;
         employeeCode: string;
         role: string;
         teamId: string;
         warehouseId: string;
-        isActive: boolean;
         lastLoginAt: Date;
-        createdAt: Date;
         teamRef: {
-            name: string;
             id: string;
+            name: string;
             allowedPages: string;
         };
     }>;

@@ -13,8 +13,8 @@ export declare class InvoicingController {
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
                 status: string;
+                deletedAt: Date | null;
                 contactId: string | null;
                 customerName: string;
                 customerPhone: string;
@@ -35,8 +35,8 @@ export declare class InvoicingController {
                 confirmedAt: Date;
             };
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
             lines: {
@@ -59,8 +59,8 @@ export declare class InvoicingController {
             }[];
             payments: ({
                 recordedBy: {
-                    name: string;
                     id: string;
+                    name: string;
                     employeeCode: string;
                 };
             } & {
@@ -138,8 +138,8 @@ export declare class InvoicingController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             contactId: string | null;
             customerName: string;
             customerPhone: string;
@@ -160,15 +160,15 @@ export declare class InvoicingController {
             confirmedAt: Date;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -389,70 +389,70 @@ export declare class InvoicingController {
         };
         company: {
             contacts: {
-                email: string | null;
-                name: string;
-                phone: string;
                 id: string;
                 tenantId: string | null;
+                name: string;
+                email: string | null;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                phone: string;
                 deletedAt: Date | null;
                 companyId: string | null;
                 designation: string | null;
                 isPrimary: boolean;
             }[];
         } & {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             address: string | null;
             city: string | null;
             state: string | null;
             website: string | null;
             gstin: string | null;
+            deletedAt: Date | null;
             industry: string | null;
             billingEmail: string | null;
         };
         order: {
             contact: {
                 company: {
-                    name: string;
                     id: string;
                     tenantId: string;
+                    name: string;
                     createdById: string | null;
                     createdAt: Date;
                     updatedAt: Date;
-                    deletedAt: Date | null;
                     address: string | null;
                     city: string | null;
                     state: string | null;
                     website: string | null;
                     gstin: string | null;
+                    deletedAt: Date | null;
                     industry: string | null;
                     billingEmail: string | null;
                 };
             } & {
-                email: string | null;
-                name: string;
-                phone: string;
                 id: string;
                 tenantId: string | null;
+                name: string;
+                email: string | null;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                phone: string;
                 deletedAt: Date | null;
                 companyId: string | null;
                 designation: string | null;
                 isPrimary: boolean;
             };
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
@@ -461,8 +461,8 @@ export declare class InvoicingController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             contactId: string | null;
             customerName: string;
             customerPhone: string;
@@ -483,15 +483,15 @@ export declare class InvoicingController {
             confirmedAt: Date;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -528,8 +528,8 @@ export declare class InvoicingController {
         })[];
         payments: ({
             recordedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
@@ -598,8 +598,8 @@ export declare class InvoicingController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             contactId: string | null;
             customerName: string;
             customerPhone: string;
@@ -620,15 +620,15 @@ export declare class InvoicingController {
             confirmedAt: Date;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -729,8 +729,8 @@ export declare class InvoicingController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             contactId: string | null;
             customerName: string;
             customerPhone: string;
@@ -751,15 +751,15 @@ export declare class InvoicingController {
             confirmedAt: Date;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -881,70 +881,70 @@ export declare class InvoicingController {
         };
         company: {
             contacts: {
-                email: string | null;
-                name: string;
-                phone: string;
                 id: string;
                 tenantId: string | null;
+                name: string;
+                email: string | null;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                phone: string;
                 deletedAt: Date | null;
                 companyId: string | null;
                 designation: string | null;
                 isPrimary: boolean;
             }[];
         } & {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             address: string | null;
             city: string | null;
             state: string | null;
             website: string | null;
             gstin: string | null;
+            deletedAt: Date | null;
             industry: string | null;
             billingEmail: string | null;
         };
         order: {
             contact: {
                 company: {
-                    name: string;
                     id: string;
                     tenantId: string;
+                    name: string;
                     createdById: string | null;
                     createdAt: Date;
                     updatedAt: Date;
-                    deletedAt: Date | null;
                     address: string | null;
                     city: string | null;
                     state: string | null;
                     website: string | null;
                     gstin: string | null;
+                    deletedAt: Date | null;
                     industry: string | null;
                     billingEmail: string | null;
                 };
             } & {
-                email: string | null;
-                name: string;
-                phone: string;
                 id: string;
                 tenantId: string | null;
+                name: string;
+                email: string | null;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                phone: string;
                 deletedAt: Date | null;
                 companyId: string | null;
                 designation: string | null;
                 isPrimary: boolean;
             };
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
@@ -953,8 +953,8 @@ export declare class InvoicingController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             contactId: string | null;
             customerName: string;
             customerPhone: string;
@@ -975,15 +975,15 @@ export declare class InvoicingController {
             confirmedAt: Date;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -1020,8 +1020,8 @@ export declare class InvoicingController {
         })[];
         payments: ({
             recordedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
@@ -1110,70 +1110,70 @@ export declare class InvoicingController {
         };
         company: {
             contacts: {
-                email: string | null;
-                name: string;
-                phone: string;
                 id: string;
                 tenantId: string | null;
+                name: string;
+                email: string | null;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                phone: string;
                 deletedAt: Date | null;
                 companyId: string | null;
                 designation: string | null;
                 isPrimary: boolean;
             }[];
         } & {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             address: string | null;
             city: string | null;
             state: string | null;
             website: string | null;
             gstin: string | null;
+            deletedAt: Date | null;
             industry: string | null;
             billingEmail: string | null;
         };
         order: {
             contact: {
                 company: {
-                    name: string;
                     id: string;
                     tenantId: string;
+                    name: string;
                     createdById: string | null;
                     createdAt: Date;
                     updatedAt: Date;
-                    deletedAt: Date | null;
                     address: string | null;
                     city: string | null;
                     state: string | null;
                     website: string | null;
                     gstin: string | null;
+                    deletedAt: Date | null;
                     industry: string | null;
                     billingEmail: string | null;
                 };
             } & {
-                email: string | null;
-                name: string;
-                phone: string;
                 id: string;
                 tenantId: string | null;
+                name: string;
+                email: string | null;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                phone: string;
                 deletedAt: Date | null;
                 companyId: string | null;
                 designation: string | null;
                 isPrimary: boolean;
             };
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
@@ -1182,8 +1182,8 @@ export declare class InvoicingController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             contactId: string | null;
             customerName: string;
             customerPhone: string;
@@ -1204,15 +1204,15 @@ export declare class InvoicingController {
             confirmedAt: Date;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -1249,8 +1249,8 @@ export declare class InvoicingController {
         })[];
         payments: ({
             recordedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {

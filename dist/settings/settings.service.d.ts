@@ -17,19 +17,19 @@ export declare class SettingsService {
         companyLogoUrl?: string | null;
     }): Promise<CompanyBrandingConfig>;
     getCompanyProfile(user: ScopedUser): Promise<{
-        email: string | null;
-        name: string;
-        phone: string | null;
         id: string;
+        name: string;
+        email: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         code: string;
         slug: string;
+        webhookKeyHash: string | null;
         status: string;
         planTier: string;
         maxUsers: number;
         logoUrl: string | null;
+        phone: string | null;
         address: string | null;
         city: string | null;
         state: string | null;
@@ -53,24 +53,24 @@ export declare class SettingsService {
         stampUrl: string | null;
         isOnboarded: boolean;
         isInternal: boolean;
-        webhookKeyHash: string | null;
+        deletedAt: Date | null;
         scheduledDeletionDate: Date | null;
         deletionConfirmToken: string | null;
     }>;
     updateCompanyProfile(user: ScopedUser, dto: any): Promise<{
-        email: string | null;
-        name: string;
-        phone: string | null;
         id: string;
+        name: string;
+        email: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         code: string;
         slug: string;
+        webhookKeyHash: string | null;
         status: string;
         planTier: string;
         maxUsers: number;
         logoUrl: string | null;
+        phone: string | null;
         address: string | null;
         city: string | null;
         state: string | null;
@@ -94,24 +94,24 @@ export declare class SettingsService {
         stampUrl: string | null;
         isOnboarded: boolean;
         isInternal: boolean;
-        webhookKeyHash: string | null;
+        deletedAt: Date | null;
         scheduledDeletionDate: Date | null;
         deletionConfirmToken: string | null;
     }>;
     getMailAccounts(user: ScopedUser): Promise<{
-        email: string;
-        name: string;
         id: string;
         tenantId: string;
-        isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        purpose: string;
+        name: string;
+        email: string;
         senderName: string;
         smtpHost: string;
         smtpPort: number;
         smtpUser: string;
         isSecure: boolean;
+        purpose: string;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
     }[]>;
     createMailAccount(user: ScopedUser, dto: {
         name: string;
@@ -124,19 +124,19 @@ export declare class SettingsService {
         isSecure?: boolean;
         purpose?: string;
     }): Promise<{
-        email: string;
-        name: string;
         id: string;
         tenantId: string;
-        isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        purpose: string;
+        name: string;
+        email: string;
         senderName: string;
         smtpHost: string;
         smtpPort: number;
         smtpUser: string;
         isSecure: boolean;
+        purpose: string;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     updateMailAccount(user: ScopedUser, id: string, dto: {
         name?: string;
@@ -150,19 +150,19 @@ export declare class SettingsService {
         purpose?: string;
         isActive?: boolean;
     }): Promise<{
-        email: string;
-        name: string;
         id: string;
         tenantId: string;
-        isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        purpose: string;
+        name: string;
+        email: string;
         senderName: string;
         smtpHost: string;
         smtpPort: number;
         smtpUser: string;
         isSecure: boolean;
+        purpose: string;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     deleteMailAccount(user: ScopedUser, id: string): Promise<{
         success: boolean;

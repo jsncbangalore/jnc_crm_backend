@@ -7,25 +7,25 @@ export declare class LeadsController {
     constructor(leadsService: LeadsService);
     createLead(dto: CreateLeadDto, user: ScopedUser): Promise<{
         company: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             address: string | null;
             city: string | null;
             state: string | null;
             website: string | null;
             gstin: string | null;
+            deletedAt: Date | null;
             industry: string | null;
             billingEmail: string | null;
         };
         assignedTo: {
-            email: string;
-            name: string;
             id: string;
+            name: string;
+            email: string;
             employeeCode: string;
         };
     } & {
@@ -34,9 +34,9 @@ export declare class LeadsController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
         city: string | null;
+        deletedAt: Date | null;
         leadNumber: string;
         source: string;
         companyId: string | null;
@@ -59,45 +59,44 @@ export declare class LeadsController {
     getLeads(user: ScopedUser, status?: string, source?: string, assignedToId?: string, search?: string, startDate?: string, endDate?: string, page?: number, limit?: number): Promise<{
         items: ({
             company: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
                 address: string | null;
                 city: string | null;
                 state: string | null;
                 website: string | null;
                 gstin: string | null;
+                deletedAt: Date | null;
                 industry: string | null;
                 billingEmail: string | null;
             };
             contact: {
-                email: string | null;
-                name: string;
-                phone: string;
                 id: string;
                 tenantId: string | null;
+                name: string;
+                email: string | null;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                phone: string;
                 deletedAt: Date | null;
                 companyId: string | null;
                 designation: string | null;
                 isPrimary: boolean;
             };
             assignedTo: {
-                email: string;
-                name: string;
                 id: string;
+                name: string;
+                email: string;
                 employeeCode: string;
             };
             activities: {
                 id: string;
                 createdAt: Date;
-                userId: string | null;
                 type: string;
                 title: string;
                 description: string | null;
@@ -105,6 +104,7 @@ export declare class LeadsController {
                 completedAt: Date | null;
                 isCompleted: boolean;
                 leadId: string;
+                userId: string | null;
             }[];
         } & {
             id: string;
@@ -112,9 +112,9 @@ export declare class LeadsController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
             city: string | null;
+            deletedAt: Date | null;
             leadNumber: string;
             source: string;
             companyId: string | null;
@@ -142,30 +142,30 @@ export declare class LeadsController {
     downloadTemplate(res: Response): Response<any, Record<string, any>>;
     getLead(id: string, user: ScopedUser): Promise<{
         company: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             address: string | null;
             city: string | null;
             state: string | null;
             website: string | null;
             gstin: string | null;
+            deletedAt: Date | null;
             industry: string | null;
             billingEmail: string | null;
         };
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -174,9 +174,9 @@ export declare class LeadsController {
         quotations: ({
             lines: ({
                 sku: {
-                    name: string;
                     id: string;
                     tenantId: string;
+                    name: string;
                     createdAt: Date;
                     updatedAt: Date;
                     deletedAt: Date | null;
@@ -209,8 +209,8 @@ export declare class LeadsController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             leadId: string | null;
             contactId: string | null;
             quoteNumber: string;
@@ -223,21 +223,20 @@ export declare class LeadsController {
             terms: string | null;
         })[];
         assignedTo: {
-            email: string;
-            name: string;
             id: string;
+            name: string;
+            email: string;
             employeeCode: string;
         };
         activities: ({
             performedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
             id: string;
             createdAt: Date;
-            userId: string | null;
             type: string;
             title: string;
             description: string | null;
@@ -245,6 +244,7 @@ export declare class LeadsController {
             completedAt: Date | null;
             isCompleted: boolean;
             leadId: string;
+            userId: string | null;
         })[];
     } & {
         id: string;
@@ -252,9 +252,9 @@ export declare class LeadsController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
         city: string | null;
+        deletedAt: Date | null;
         leadNumber: string;
         source: string;
         companyId: string | null;
@@ -276,30 +276,30 @@ export declare class LeadsController {
     }>;
     updateStatus(id: string, dto: UpdateLeadStatusDto, user: ScopedUser): Promise<{
         company: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             address: string | null;
             city: string | null;
             state: string | null;
             website: string | null;
             gstin: string | null;
+            deletedAt: Date | null;
             industry: string | null;
             billingEmail: string | null;
         };
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -308,9 +308,9 @@ export declare class LeadsController {
         quotations: ({
             lines: ({
                 sku: {
-                    name: string;
                     id: string;
                     tenantId: string;
+                    name: string;
                     createdAt: Date;
                     updatedAt: Date;
                     deletedAt: Date | null;
@@ -343,8 +343,8 @@ export declare class LeadsController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             leadId: string | null;
             contactId: string | null;
             quoteNumber: string;
@@ -357,21 +357,20 @@ export declare class LeadsController {
             terms: string | null;
         })[];
         assignedTo: {
-            email: string;
-            name: string;
             id: string;
+            name: string;
+            email: string;
             employeeCode: string;
         };
         activities: ({
             performedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
             id: string;
             createdAt: Date;
-            userId: string | null;
             type: string;
             title: string;
             description: string | null;
@@ -379,6 +378,7 @@ export declare class LeadsController {
             completedAt: Date | null;
             isCompleted: boolean;
             leadId: string;
+            userId: string | null;
         })[];
     } & {
         id: string;
@@ -386,9 +386,9 @@ export declare class LeadsController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
         city: string | null;
+        deletedAt: Date | null;
         leadNumber: string;
         source: string;
         companyId: string | null;
@@ -410,14 +410,13 @@ export declare class LeadsController {
     }>;
     addActivity(id: string, dto: CreateLeadActivityDto, user: ScopedUser): Promise<{
         performedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
     } & {
         id: string;
         createdAt: Date;
-        userId: string | null;
         type: string;
         title: string;
         description: string | null;
@@ -425,13 +424,14 @@ export declare class LeadsController {
         completedAt: Date | null;
         isCompleted: boolean;
         leadId: string;
+        userId: string | null;
     }>;
     shareLead(id: string, dto: ShareLeadDto, user: ScopedUser): Promise<{
         id: string;
         tenantId: string;
         createdAt: Date;
-        userId: string;
         leadId: string;
+        userId: string;
         sharedById: string | null;
     }>;
     previewSpreadsheet(file: Express.Multer.File, user: ScopedUser): Promise<{

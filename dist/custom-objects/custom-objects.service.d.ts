@@ -40,8 +40,8 @@ export declare class CustomObjectsService {
             updatedAt: Date;
             lastModified: string;
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         }[];
@@ -62,8 +62,8 @@ export declare class CustomObjectsService {
         isStandard: boolean;
         type: string;
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         fields: {
@@ -333,8 +333,8 @@ export declare class CustomObjectsService {
         createdAt: Date;
         updatedAt: Date;
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
     }>;
@@ -347,13 +347,13 @@ export declare class CustomObjectsService {
         createdAt: Date;
         updatedAt: Date;
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         updatedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
     }>;
@@ -361,13 +361,13 @@ export declare class CustomObjectsService {
         success: boolean;
         message: string;
         record: {
-            data: string;
             id: string;
             tenantId: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
+            data: string;
             objectId: string;
             updatedById: string | null;
         };

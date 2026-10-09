@@ -8,9 +8,9 @@ export declare class InventoryController {
     getStockLevels(user: ScopedUser, warehouseId?: string, search?: string, lowStock?: string, page?: number, limit?: number): Promise<any[]>;
     recordMovement(data: RecordMovementDto, user: ScopedUser): Promise<{
         sku: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
@@ -46,28 +46,28 @@ export declare class InventoryController {
     getMovements(user: ScopedUser, warehouseId?: string, skuId?: string, type?: string, page?: number, limit?: number): Promise<{
         items: ({
             supplier: {
-                email: string | null;
-                name: string;
-                phone: string | null;
                 id: string;
                 tenantId: string;
+                name: string;
+                email: string | null;
                 isActive: boolean;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
+                phone: string | null;
                 address: string | null;
                 city: string | null;
                 gstin: string | null;
+                deletedAt: Date | null;
                 notes: string | null;
                 contactPerson: string | null;
                 leadTimeDays: number;
                 rating: number | null;
             };
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -85,33 +85,33 @@ export declare class InventoryController {
                 preferredSupplierId: string | null;
             };
             performedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
             sourceWarehouse: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
                 code: string;
                 address: string | null;
                 city: string | null;
+                deletedAt: Date | null;
             };
             destWarehouse: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
                 code: string;
                 address: string | null;
                 city: string | null;
+                deletedAt: Date | null;
             };
         } & {
             id: string;
@@ -137,19 +137,19 @@ export declare class InventoryController {
     getReorderAlerts(user: ScopedUser): Promise<{
         sku: {
             preferredSupplier: {
-                email: string | null;
-                name: string;
-                phone: string | null;
                 id: string;
                 tenantId: string;
+                name: string;
+                email: string | null;
                 isActive: boolean;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
+                phone: string | null;
                 address: string | null;
                 city: string | null;
                 gstin: string | null;
+                deletedAt: Date | null;
                 notes: string | null;
                 contactPerson: string | null;
                 leadTimeDays: number;
@@ -157,9 +157,9 @@ export declare class InventoryController {
             };
             stockItems: {
                 id: string;
-                warehouseId: string;
                 createdAt: Date;
                 updatedAt: Date;
+                warehouseId: string;
                 skuId: string;
                 quantityOnHand: number;
                 quantityReserved: number;
@@ -169,9 +169,9 @@ export declare class InventoryController {
                 binId: string | null;
             }[];
         } & {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
@@ -197,45 +197,45 @@ export declare class InventoryController {
         };
         bins: {
             id: string;
-            warehouseId: string;
             createdAt: Date;
+            warehouseId: string;
             binCode: string;
             zone: string;
             rack: string;
             shelf: string;
         }[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         code: string;
         address: string | null;
         city: string | null;
+        deletedAt: Date | null;
     })[]>;
     createWarehouse(data: CreateWarehouseDto, user: ScopedUser): Promise<{
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         code: string;
         address: string | null;
         city: string | null;
+        deletedAt: Date | null;
     }>;
     getSkus(user: ScopedUser, search?: string): Promise<{
         preferredSupplier: {
-            name: string;
             id: string;
+            name: string;
         };
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
@@ -253,9 +253,9 @@ export declare class InventoryController {
     }[]>;
     getSku(id: string, user: ScopedUser): Promise<any>;
     createSku(data: CreateSkuDto, user: ScopedUser): Promise<{
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
@@ -273,9 +273,9 @@ export declare class InventoryController {
         preferredSupplierId: string | null;
     }>;
     updateSku(id: string, data: UpdateSkuDto, user: ScopedUser): Promise<{
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
@@ -313,9 +313,9 @@ export declare class InventoryController {
     downloadTemplate(res: Response): Response<any, Record<string, any>>;
     initiateTransfer(body: TransferStockDto, user: ScopedUser): Promise<{
         sku: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
@@ -333,32 +333,32 @@ export declare class InventoryController {
             preferredSupplierId: string | null;
         };
         sourceWarehouse: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             code: string;
             address: string | null;
             city: string | null;
+            deletedAt: Date | null;
         };
         destinationWarehouse: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             code: string;
             address: string | null;
             city: string | null;
+            deletedAt: Date | null;
         };
         initiatedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
     } & {
@@ -382,9 +382,9 @@ export declare class InventoryController {
     getTransfers(user: ScopedUser, page?: number, limit?: number, status?: string, warehouseId?: string, search?: string): Promise<{
         items: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -402,37 +402,37 @@ export declare class InventoryController {
                 preferredSupplierId: string | null;
             };
             sourceWarehouse: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
                 code: string;
                 address: string | null;
                 city: string | null;
+                deletedAt: Date | null;
             };
             destinationWarehouse: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
                 code: string;
                 address: string | null;
                 city: string | null;
+                deletedAt: Date | null;
             };
             initiatedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
             receivedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
@@ -464,9 +464,9 @@ export declare class InventoryController {
     }>;
     receiveTransfer(id: string, user: ScopedUser): Promise<{
         sku: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
@@ -484,37 +484,37 @@ export declare class InventoryController {
             preferredSupplierId: string | null;
         };
         sourceWarehouse: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             code: string;
             address: string | null;
             city: string | null;
+            deletedAt: Date | null;
         };
         destinationWarehouse: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             code: string;
             address: string | null;
             city: string | null;
+            deletedAt: Date | null;
         };
         initiatedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         receivedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
     } & {
@@ -537,9 +537,9 @@ export declare class InventoryController {
     }>;
     cancelTransfer(id: string, user: ScopedUser): Promise<{
         sku: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
@@ -557,32 +557,32 @@ export declare class InventoryController {
             preferredSupplierId: string | null;
         };
         sourceWarehouse: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             code: string;
             address: string | null;
             city: string | null;
+            deletedAt: Date | null;
         };
         destinationWarehouse: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             code: string;
             address: string | null;
             city: string | null;
+            deletedAt: Date | null;
         };
         initiatedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
     } & {
@@ -610,8 +610,8 @@ export declare class InventoryController {
             tenantId: string;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             quantity: number;
             notes: string | null;
             unit: string;
@@ -648,8 +648,8 @@ export declare class InventoryController {
         tenantId: string;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         quantity: number;
         notes: string | null;
         unit: string;
@@ -672,8 +672,8 @@ export declare class InventoryController {
         tenantId: string;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         quantity: number;
         notes: string | null;
         unit: string;
@@ -708,8 +708,8 @@ export declare class InventoryController {
             tenantId: string;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             quantity: number;
             notes: string | null;
             unit: string;
@@ -746,8 +746,8 @@ export declare class InventoryController {
         tenantId: string;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         quantity: number;
         notes: string | null;
         unit: string;
@@ -768,22 +768,22 @@ export declare class InventoryController {
         success: boolean;
         importedCount: number;
     }>;
-    clearAllInventory(user: ScopedUser): Promise<{
+    clearAllInventory(body: any, user: ScopedUser): Promise<{
         success: boolean;
         message: string;
     }>;
     downloadProjectStockTemplate(res: Response): Response<any, Record<string, any>>;
     getProducts(user: ScopedUser): Promise<({
         skus: {
-            name: string;
             id: string;
+            name: string;
             skuCode: string;
             category: string;
         }[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
@@ -807,9 +807,9 @@ export declare class InventoryController {
             reorderPoint: number;
             reorderQty: number;
             preferredSupplier: {
+                id: string;
                 name: string;
                 phone: string;
-                id: string;
             };
             preferredSupplierId: string;
         }[];
@@ -827,14 +827,14 @@ export declare class InventoryController {
     private serveSafeTenantDoc;
     getSupplierPurchases(supplierId: string, user: ScopedUser): Promise<({
         sku: {
-            name: string;
             id: string;
+            name: string;
             skuCode: string;
             category: string;
         };
         performedBy: {
-            name: string;
             id: string;
+            name: string;
         };
     } & {
         id: string;

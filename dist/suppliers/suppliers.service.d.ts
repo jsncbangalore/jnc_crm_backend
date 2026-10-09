@@ -16,19 +16,19 @@ export declare class SuppliersService {
     private scopingService;
     constructor(prisma: PrismaService, scopingService: ScopingService);
     create(dto: CreateSupplierDto, user?: ScopedUser): Promise<{
-        email: string | null;
-        name: string;
-        phone: string | null;
         id: string;
         tenantId: string;
+        name: string;
+        email: string | null;
         isActive: boolean;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
+        phone: string | null;
         address: string | null;
         city: string | null;
         gstin: string | null;
+        deletedAt: Date | null;
         notes: string | null;
         contactPerson: string | null;
         leadTimeDays: number;
@@ -43,25 +43,25 @@ export declare class SuppliersService {
             preferredSkus: number;
         };
         preferredSkus: {
-            name: string;
             id: string;
+            name: string;
             skuCode: string;
             category: string;
         }[];
     } & {
-        email: string | null;
-        name: string;
-        phone: string | null;
         id: string;
         tenantId: string;
+        name: string;
+        email: string | null;
         isActive: boolean;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
+        phone: string | null;
         address: string | null;
         city: string | null;
         gstin: string | null;
+        deletedAt: Date | null;
         notes: string | null;
         contactPerson: string | null;
         leadTimeDays: number;
@@ -70,9 +70,9 @@ export declare class SuppliersService {
     findOne(id: string, user?: ScopedUser): Promise<{
         stockMovements: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -106,9 +106,9 @@ export declare class SuppliersService {
             performedById: string | null;
         })[];
         preferredSkus: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
@@ -126,19 +126,19 @@ export declare class SuppliersService {
             preferredSupplierId: string | null;
         }[];
     } & {
-        email: string | null;
-        name: string;
-        phone: string | null;
         id: string;
         tenantId: string;
+        name: string;
+        email: string | null;
         isActive: boolean;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
+        phone: string | null;
         address: string | null;
         city: string | null;
         gstin: string | null;
+        deletedAt: Date | null;
         notes: string | null;
         contactPerson: string | null;
         leadTimeDays: number;
@@ -147,9 +147,9 @@ export declare class SuppliersService {
     update(id: string, dto: Partial<CreateSupplierDto>, user?: ScopedUser): Promise<{
         stockMovements: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -183,9 +183,9 @@ export declare class SuppliersService {
             performedById: string | null;
         })[];
         preferredSkus: {
-            name: string;
             id: string;
             tenantId: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
@@ -203,19 +203,19 @@ export declare class SuppliersService {
             preferredSupplierId: string | null;
         }[];
     } & {
-        email: string | null;
-        name: string;
-        phone: string | null;
         id: string;
         tenantId: string;
+        name: string;
+        email: string | null;
         isActive: boolean;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
+        phone: string | null;
         address: string | null;
         city: string | null;
         gstin: string | null;
+        deletedAt: Date | null;
         notes: string | null;
         contactPerson: string | null;
         leadTimeDays: number;

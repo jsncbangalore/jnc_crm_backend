@@ -266,8 +266,8 @@ NET-CAB-CAT6-305,Cat6 UTP 4-Pair Solid Bare Copper 305m Drum,Network Infrastruct
         }
         return this.inventoryService.bulkImportProjectStockPositions(body.rows, user);
     }
-    async clearAllInventory(user) {
-        return this.inventoryService.clearAllInventory(user);
+    async clearAllInventory(body, user) {
+        return this.inventoryService.clearAllInventory(body?.confirm, user);
     }
     downloadProjectStockTemplate(res) {
         const csvContent = `Project,Reference,Quantity,Item Code,Part Value,Package,Unit,BOM Qty / Unit,Batch Qty,Planned Requirement,Opening Stock,Inflow,Outflow,Present Stock,Shortage,Status,Notes
@@ -631,9 +631,10 @@ __decorate([
 __decorate([
     (0, common_1.Delete)('clear-all'),
     (0, roles_decorator_1.Roles)('tenant_admin'),
-    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "clearAllInventory", null);
 __decorate([

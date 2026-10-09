@@ -6,25 +6,25 @@ export declare class JwtStrategy extends JwtStrategy_base {
     constructor(prisma: PrismaService);
     validate(payload: any): Promise<{
         tenant: {
-            name: string;
             id: string;
-            deletedAt: Date;
+            name: string;
             code: string;
             slug: string;
             status: string;
             logoUrl: string;
             currency: string;
+            deletedAt: Date;
         };
         team: string;
-        email: string;
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
+        email: string;
+        isActive: boolean;
         employeeCode: string;
         role: string;
         teamId: string;
         warehouseId: string;
-        isActive: boolean;
         mustResetPassword: boolean;
         tokenVersion: number;
     }>;

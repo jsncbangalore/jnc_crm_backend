@@ -32,69 +32,69 @@ export declare class CompaniesService {
     private scopingService;
     constructor(prisma: PrismaService, scopingService: ScopingService);
     create(dto: CreateCompanyDto, user: ScopedUser): Promise<{
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         address: string | null;
         city: string | null;
         state: string | null;
         website: string | null;
         gstin: string | null;
+        deletedAt: Date | null;
         industry: string | null;
         billingEmail: string | null;
     }>;
     findAll(user: ScopedUser, query?: {
         search?: string;
     }): Promise<({
+        contacts: {
+            id: string;
+            tenantId: string | null;
+            name: string;
+            email: string | null;
+            createdById: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            phone: string;
+            deletedAt: Date | null;
+            companyId: string | null;
+            designation: string | null;
+            isPrimary: boolean;
+        }[];
         _count: {
             contacts: number;
             leads: number;
             invoices: number;
         };
-        contacts: {
-            email: string | null;
-            name: string;
-            phone: string;
-            id: string;
-            tenantId: string | null;
-            createdById: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
-            companyId: string | null;
-            designation: string | null;
-            isPrimary: boolean;
-        }[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         address: string | null;
         city: string | null;
         state: string | null;
         website: string | null;
         gstin: string | null;
+        deletedAt: Date | null;
         industry: string | null;
         billingEmail: string | null;
     })[]>;
     findOne(id: string, user: ScopedUser): Promise<{
         contacts: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -106,9 +106,9 @@ export declare class CompaniesService {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
             city: string | null;
+            deletedAt: Date | null;
             leadNumber: string;
             source: string;
             companyId: string | null;
@@ -173,31 +173,31 @@ export declare class CompaniesService {
             voidReason: string | null;
         }[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         address: string | null;
         city: string | null;
         state: string | null;
         website: string | null;
         gstin: string | null;
+        deletedAt: Date | null;
         industry: string | null;
         billingEmail: string | null;
     }>;
     update(id: string, dto: Partial<CreateCompanyDto>, user: ScopedUser): Promise<{
         contacts: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -209,9 +209,9 @@ export declare class CompaniesService {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
             city: string | null;
+            deletedAt: Date | null;
             leadNumber: string;
             source: string;
             companyId: string | null;
@@ -276,18 +276,18 @@ export declare class CompaniesService {
             voidReason: string | null;
         }[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         address: string | null;
         city: string | null;
         state: string | null;
         website: string | null;
         gstin: string | null;
+        deletedAt: Date | null;
         industry: string | null;
         billingEmail: string | null;
     }>;
@@ -295,14 +295,14 @@ export declare class CompaniesService {
         success: boolean;
     }>;
     addContact(companyId: string, dto: CreateContactDto, user: ScopedUser): Promise<{
-        email: string | null;
-        name: string;
-        phone: string;
         id: string;
         tenantId: string | null;
+        name: string;
+        email: string | null;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
+        phone: string;
         deletedAt: Date | null;
         companyId: string | null;
         designation: string | null;

@@ -5,14 +5,14 @@ export declare class QuotationsController {
     constructor(quotationsService: QuotationsService);
     create(dto: CreateQuotationDto, user: ScopedUser): Promise<{
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -24,9 +24,9 @@ export declare class QuotationsController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
             city: string | null;
+            deletedAt: Date | null;
             leadNumber: string;
             source: string;
             companyId: string | null;
@@ -47,15 +47,15 @@ export declare class QuotationsController {
             capturedAt: Date;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -88,8 +88,8 @@ export declare class QuotationsController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         leadId: string | null;
         contactId: string | null;
         quoteNumber: string;
@@ -104,14 +104,14 @@ export declare class QuotationsController {
     findAll(user: ScopedUser, status?: string, search?: string, page?: number, limit?: number): Promise<{
         items: ({
             contact: {
-                email: string | null;
-                name: string;
-                phone: string;
                 id: string;
                 tenantId: string | null;
+                name: string;
+                email: string | null;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                phone: string;
                 deletedAt: Date | null;
                 companyId: string | null;
                 designation: string | null;
@@ -123,9 +123,9 @@ export declare class QuotationsController {
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
                 status: string;
                 city: string | null;
+                deletedAt: Date | null;
                 leadNumber: string;
                 source: string;
                 companyId: string | null;
@@ -151,8 +151,8 @@ export declare class QuotationsController {
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
                 status: string;
+                deletedAt: Date | null;
                 contactId: string | null;
                 customerName: string;
                 customerPhone: string;
@@ -173,15 +173,15 @@ export declare class QuotationsController {
                 confirmedAt: Date;
             };
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
             lines: ({
                 sku: {
-                    name: string;
                     id: string;
                     tenantId: string;
+                    name: string;
                     createdAt: Date;
                     updatedAt: Date;
                     deletedAt: Date | null;
@@ -214,8 +214,8 @@ export declare class QuotationsController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             leadId: string | null;
             contactId: string | null;
             quoteNumber: string;
@@ -234,14 +234,14 @@ export declare class QuotationsController {
     }>;
     findOne(id: string, user: ScopedUser): Promise<{
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -253,9 +253,9 @@ export declare class QuotationsController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
             city: string | null;
+            deletedAt: Date | null;
             leadNumber: string;
             source: string;
             companyId: string | null;
@@ -326,8 +326,8 @@ export declare class QuotationsController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             contactId: string | null;
             customerName: string;
             customerPhone: string;
@@ -348,15 +348,15 @@ export declare class QuotationsController {
             confirmedAt: Date;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -389,8 +389,8 @@ export declare class QuotationsController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         leadId: string | null;
         contactId: string | null;
         quoteNumber: string;
@@ -404,14 +404,14 @@ export declare class QuotationsController {
     }>;
     updateStatus(id: string, body: UpdateQuotationStatusDto, user: ScopedUser): Promise<{
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -423,9 +423,9 @@ export declare class QuotationsController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
             city: string | null;
+            deletedAt: Date | null;
             leadNumber: string;
             source: string;
             companyId: string | null;
@@ -496,8 +496,8 @@ export declare class QuotationsController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             contactId: string | null;
             customerName: string;
             customerPhone: string;
@@ -518,15 +518,15 @@ export declare class QuotationsController {
             confirmedAt: Date;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -559,8 +559,8 @@ export declare class QuotationsController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         leadId: string | null;
         contactId: string | null;
         quoteNumber: string;
@@ -574,29 +574,29 @@ export declare class QuotationsController {
     }>;
     convertToOrder(id: string, user: ScopedUser): Promise<{
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
             isPrimary: boolean;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -628,8 +628,8 @@ export declare class QuotationsController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         contactId: string | null;
         customerName: string;
         customerPhone: string;

@@ -25,64 +25,64 @@ export declare class UsersService {
         isActive?: string;
     }): Promise<{
         items: {
-            email: string;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string;
+            name: string;
+            email: string;
+            isActive: boolean;
+            createdAt: Date;
+            phone: string;
             employeeCode: string;
             role: string;
             teamId: string;
             warehouseId: string;
-            isActive: boolean;
             mustResetPassword: boolean;
             lastLoginAt: Date;
-            createdAt: Date;
             teamRef: {
-                name: string;
                 id: string;
+                name: string;
                 allowedPages: string;
             };
         }[];
         total: number;
     }>;
     findOne(id: string, creator: ScopedUser): Promise<{
-        email: string;
-        name: string;
-        phone: string;
         id: string;
         tenantId: string;
+        name: string;
+        email: string;
+        isActive: boolean;
+        createdAt: Date;
+        phone: string;
         employeeCode: string;
         role: string;
         teamId: string;
         warehouseId: string;
-        isActive: boolean;
         mustResetPassword: boolean;
         lastLoginAt: Date;
-        createdAt: Date;
         teamRef: {
-            name: string;
             id: string;
+            name: string;
             allowedPages: string;
         };
     }>;
     updateUser(id: string, dto: UpdateUserDto, modifier: ScopedUser): Promise<{
-        email: string;
-        name: string;
-        phone: string;
         id: string;
         tenantId: string;
+        name: string;
+        email: string;
+        isActive: boolean;
+        createdAt: Date;
+        phone: string;
         employeeCode: string;
         role: string;
         teamId: string;
         warehouseId: string;
-        isActive: boolean;
         mustResetPassword: boolean;
         lastLoginAt: Date;
-        createdAt: Date;
         teamRef: {
-            name: string;
             id: string;
+            name: string;
             allowedPages: string;
         };
     }>;

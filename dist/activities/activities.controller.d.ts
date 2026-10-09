@@ -5,18 +5,18 @@ export declare class ActivitiesController {
     private readonly activitiesService;
     constructor(activitiesService: ActivitiesService);
     listProjects(user: ScopedUser): Promise<({
-        createdBy: {
-            name: string;
-            id: string;
-            employeeCode: string;
-        };
         _count: {
             dailyLogs: number;
         };
+        createdBy: {
+            id: string;
+            name: string;
+            employeeCode: string;
+        };
         assignments: ({
             user: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
                 role: string;
             };
@@ -29,9 +29,9 @@ export declare class ActivitiesController {
             assignedById: string | null;
         })[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -40,14 +40,14 @@ export declare class ActivitiesController {
     })[]>;
     createProject(body: CreateProjectDto, user: ScopedUser): Promise<{
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         assignments: ({
             user: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
                 role: string;
             };
@@ -60,9 +60,9 @@ export declare class ActivitiesController {
             assignedById: string | null;
         })[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -70,9 +70,9 @@ export declare class ActivitiesController {
         description: string | null;
     }>;
     updateProject(id: string, body: UpdateProjectDto, user: ScopedUser): Promise<{
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -83,17 +83,17 @@ export declare class ActivitiesController {
         success: boolean;
     }>;
     getAssignableUsers(user: ScopedUser): Promise<{
-        email: string;
-        name: string;
         id: string;
+        name: string;
+        email: string;
         employeeCode: string;
         role: string;
     }[]>;
     assignMembers(projectId: string, body: AssignMembersDto, user: ScopedUser): Promise<{
         assignments: ({
             user: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
                 role: string;
             };
@@ -106,9 +106,9 @@ export declare class ActivitiesController {
             assignedById: string | null;
         })[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -117,8 +117,8 @@ export declare class ActivitiesController {
     }>;
     listLogs(projectId: string, user: ScopedUser): Promise<({
         uploadedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
             role: string;
         };
@@ -135,8 +135,8 @@ export declare class ActivitiesController {
     })[]>;
     uploadLog(projectId: string, file: Express.Multer.File | undefined, body: UploadLogDto, user: ScopedUser): Promise<{
         uploadedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
             role: string;
         };

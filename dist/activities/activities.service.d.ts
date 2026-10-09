@@ -5,18 +5,18 @@ export declare class ActivitiesService {
     private readonly logger;
     constructor(prisma: PrismaService);
     listProjects(user: ScopedUser): Promise<({
-        createdBy: {
-            name: string;
-            id: string;
-            employeeCode: string;
-        };
         _count: {
             dailyLogs: number;
         };
+        createdBy: {
+            id: string;
+            name: string;
+            employeeCode: string;
+        };
         assignments: ({
             user: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
                 role: string;
             };
@@ -29,9 +29,9 @@ export declare class ActivitiesService {
             assignedById: string | null;
         })[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -44,14 +44,14 @@ export declare class ActivitiesService {
         status?: string;
     }): Promise<{
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         assignments: ({
             user: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
                 role: string;
             };
@@ -64,9 +64,9 @@ export declare class ActivitiesService {
             assignedById: string | null;
         })[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -78,9 +78,9 @@ export declare class ActivitiesService {
         description?: string;
         status?: string;
     }): Promise<{
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -91,17 +91,17 @@ export declare class ActivitiesService {
         success: boolean;
     }>;
     getAssignableUsers(user: ScopedUser): Promise<{
-        email: string;
-        name: string;
         id: string;
+        name: string;
+        email: string;
         employeeCode: string;
         role: string;
     }[]>;
     assignMembers(user: ScopedUser, projectId: string, memberIds: string[]): Promise<{
         assignments: ({
             user: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
                 role: string;
             };
@@ -114,9 +114,9 @@ export declare class ActivitiesService {
             assignedById: string | null;
         })[];
     } & {
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -125,8 +125,8 @@ export declare class ActivitiesService {
     }>;
     listLogs(user: ScopedUser, projectId: string): Promise<({
         uploadedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
             role: string;
         };
@@ -147,8 +147,8 @@ export declare class ActivitiesService {
         records: any[];
     }): Promise<{
         uploadedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
             role: string;
         };

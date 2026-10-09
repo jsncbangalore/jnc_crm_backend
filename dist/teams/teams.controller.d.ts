@@ -9,25 +9,25 @@ export declare class TeamsController {
         _count: {
             users: number;
         };
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
     }[]>;
     createTeam(user: ScopedUser, dto: CreateTeamDto): Promise<{
         allowedPages: any;
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
     }>;
     updateTeam(user: ScopedUser, id: string, dto: UpdateTeamDto): Promise<{
         allowedPages: any;
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
     }>;

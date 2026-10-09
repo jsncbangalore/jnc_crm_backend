@@ -28,29 +28,29 @@ export declare class AuthController {
     getProfile(user: any): Promise<any>;
     updateProfile(user: any, body: UpdateProfileDto): Promise<{
         tenant: {
-            name: string;
             id: string;
+            name: string;
             code: string;
             slug: string;
             status: string;
             logoUrl: string;
             currency: string;
         };
-        email: string;
-        name: string;
-        phone: string;
         id: string;
         tenantId: string;
+        name: string;
+        email: string;
+        isActive: boolean;
+        createdAt: Date;
+        phone: string;
         employeeCode: string;
         role: string;
         teamId: string;
         warehouseId: string;
-        isActive: boolean;
         lastLoginAt: Date;
-        createdAt: Date;
         teamRef: {
-            name: string;
             id: string;
+            name: string;
             allowedPages: string;
         };
     }>;

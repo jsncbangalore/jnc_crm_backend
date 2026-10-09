@@ -29,8 +29,8 @@ export declare class CustomObjectsController {
             updatedAt: Date;
             lastModified: string;
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         }[];
@@ -51,8 +51,8 @@ export declare class CustomObjectsController {
         isStandard: boolean;
         type: string;
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         fields: {
@@ -289,8 +289,8 @@ export declare class CustomObjectsController {
         createdAt: Date;
         updatedAt: Date;
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
     }>;
@@ -303,13 +303,13 @@ export declare class CustomObjectsController {
         createdAt: Date;
         updatedAt: Date;
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         updatedBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
     }>;
@@ -317,13 +317,13 @@ export declare class CustomObjectsController {
         success: boolean;
         message: string;
         record: {
-            data: string;
             id: string;
             tenantId: string;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
+            data: string;
             objectId: string;
             updatedById: string | null;
         };

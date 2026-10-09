@@ -72,6 +72,7 @@ model Tenant {
   leadShares      LeadShare[]
   mailAccounts    MailAccount[]  // Per-tenant isolated SMTP configurations
   suppliers       Supplier[]
+  purchaseBills   PurchaseBill[]
   products        Product[]
   skus            Sku[]
   warehouses      Warehouse[]
@@ -145,6 +146,7 @@ model User {
   createdContacts   Contact[]  @relation("CreatedContacts")
   createdLeads      Lead[]     @relation("CreatedLeads")
   createdSuppliers  Supplier[] @relation("CreatedSuppliers")
+  createdPurchaseBills PurchaseBill[] @relation("CreatedPurchaseBills")
   passwordResetTokens PasswordResetToken[]
   refreshSessions   RefreshSession[]
 
@@ -368,6 +370,37 @@ model Supplier {
   createdBy     User?           @relation("CreatedSuppliers", fields: [createdById], references: [id])
   preferredSkus Sku[]           @relation("PreferredSupplier")
   stockMovements StockMovement[] @relation("SupplierMovements")
+
+  @@index([tenantId])
+}
+
+model PurchaseBill {
+  id             String    @id @default(uuid())
+  tenantId       String
+  invoiceNumber  String
+  vendorName     String
+  vendorGstin    String?
+  vendorAddress  String?
+  invoiceDate    String?
+  project        String?   @default("General Inventory")
+  items          Json?     @default("[]")
+  subtotal       Float     @default(0)
+  taxRate        Float     @default(18)
+  cgst           Float     @default(0)
+  sgst           Float     @default(0)
+  igst           Float     @default(0)
+  totalTax       Float     @default(0)
+  grandTotal     Float     @default(0)
+  documentUrl    String?
+  rawText        String?
+  notes          String?
+  createdById    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  tenant         Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy      User?     @relation("CreatedPurchaseBills", fields: [createdById], references: [id])
 
   @@index([tenantId])
 }

@@ -38,9 +38,9 @@ export declare class AuditService {
     }): Promise<{
         items: ({
             actor: {
-                email: string;
-                name: string;
                 id: string;
+                name: string;
+                email: string;
                 employeeCode: string;
             };
         } & {

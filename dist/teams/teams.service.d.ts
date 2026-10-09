@@ -19,25 +19,25 @@ export declare class TeamsService {
         _count: {
             users: number;
         };
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
     }[]>;
     createTeam(dto: CreateTeamDto, creator: ScopedUser): Promise<{
         allowedPages: any;
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
     }>;
     updateTeam(id: string, dto: UpdateTeamDto, creator: ScopedUser): Promise<{
         allowedPages: any;
-        name: string;
         id: string;
         tenantId: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
     }>;

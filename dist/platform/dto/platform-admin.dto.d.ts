@@ -9,6 +9,7 @@ export declare class CreatePlatformAdminDto {
     name: string;
     fullName?: string;
     phone?: string;
+    role?: string;
     password?: string;
 }
 export declare class TogglePlatformAdminActiveDto {

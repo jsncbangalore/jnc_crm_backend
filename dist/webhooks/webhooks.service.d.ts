@@ -6,19 +6,19 @@ export declare class WebhooksService {
     private readonly logger;
     constructor(leadsService: LeadsService, prisma: PrismaService);
     findTenantByWebhookKey(plainKey: string): Promise<{
-        email: string | null;
-        name: string;
-        phone: string | null;
         id: string;
+        name: string;
+        email: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         code: string;
         slug: string;
+        webhookKeyHash: string | null;
         status: string;
         planTier: string;
         maxUsers: number;
         logoUrl: string | null;
+        phone: string | null;
         address: string | null;
         city: string | null;
         state: string | null;
@@ -42,7 +42,7 @@ export declare class WebhooksService {
         stampUrl: string | null;
         isOnboarded: boolean;
         isInternal: boolean;
-        webhookKeyHash: string | null;
+        deletedAt: Date | null;
         scheduledDeletionDate: Date | null;
         deletionConfirmToken: string | null;
     }>;
@@ -71,9 +71,9 @@ export declare class WebhooksService {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
             city: string | null;
+            deletedAt: Date | null;
             leadNumber: string;
             source: string;
             companyId: string | null;
@@ -102,9 +102,9 @@ export declare class WebhooksService {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
             city: string | null;
+            deletedAt: Date | null;
             leadNumber: string;
             source: string;
             companyId: string | null;
@@ -134,9 +134,9 @@ export declare class WebhooksService {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
             city: string | null;
+            deletedAt: Date | null;
             leadNumber: string;
             source: string;
             companyId: string | null;

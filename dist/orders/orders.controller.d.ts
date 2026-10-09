@@ -5,29 +5,29 @@ export declare class OrdersController {
     constructor(ordersService: OrdersService);
     create(dto: CreateOrderDto, user: ScopedUser): Promise<{
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
             isPrimary: boolean;
         };
         createdBy: {
-            name: string;
             id: string;
+            name: string;
             employeeCode: string;
         };
         lines: ({
             sku: {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -59,8 +59,8 @@ export declare class OrdersController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         contactId: string | null;
         customerName: string;
         customerPhone: string;
@@ -83,23 +83,18 @@ export declare class OrdersController {
     findAll(user: ScopedUser, status?: string, search?: string, page?: number, limit?: number): Promise<{
         items: ({
             contact: {
-                email: string | null;
-                name: string;
-                phone: string;
                 id: string;
                 tenantId: string | null;
+                name: string;
+                email: string | null;
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                phone: string;
                 deletedAt: Date | null;
                 companyId: string | null;
                 designation: string | null;
                 isPrimary: boolean;
-            };
-            createdBy: {
-                name: string;
-                id: string;
-                employeeCode: string;
             };
             shipments: {
                 id: string;
@@ -179,11 +174,16 @@ export declare class OrdersController {
                 voidedAt: Date | null;
                 voidReason: string | null;
             })[];
+            createdBy: {
+                id: string;
+                name: string;
+                employeeCode: string;
+            };
             lines: ({
                 sku: {
-                    name: string;
                     id: string;
                     tenantId: string;
+                    name: string;
                     createdAt: Date;
                     updatedAt: Date;
                     deletedAt: Date | null;
@@ -211,8 +211,8 @@ export declare class OrdersController {
             })[];
             payments: ({
                 recordedBy: {
-                    name: string;
                     id: string;
+                    name: string;
                     employeeCode: string;
                 };
             } & {
@@ -236,8 +236,8 @@ export declare class OrdersController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             contactId: string | null;
             customerName: string;
             customerPhone: string;
@@ -264,14 +264,14 @@ export declare class OrdersController {
     }>;
     findOne(id: string, user: ScopedUser): Promise<{
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -294,8 +294,8 @@ export declare class OrdersController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             leadId: string | null;
             contactId: string | null;
             quoteNumber: string;
@@ -306,11 +306,6 @@ export declare class OrdersController {
             validUntil: Date;
             notes: string | null;
             terms: string | null;
-        };
-        createdBy: {
-            name: string;
-            id: string;
-            employeeCode: string;
         };
         shipments: {
             id: string;
@@ -329,8 +324,8 @@ export declare class OrdersController {
         }[];
         invoices: ({
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
             lines: {
@@ -395,31 +390,36 @@ export declare class OrdersController {
             voidedAt: Date | null;
             voidReason: string | null;
         })[];
+        createdBy: {
+            id: string;
+            name: string;
+            employeeCode: string;
+        };
         lines: ({
             sku: {
                 preferredSupplier: {
-                    email: string | null;
-                    name: string;
-                    phone: string | null;
                     id: string;
                     tenantId: string;
+                    name: string;
+                    email: string | null;
                     isActive: boolean;
                     createdById: string | null;
                     createdAt: Date;
                     updatedAt: Date;
-                    deletedAt: Date | null;
+                    phone: string | null;
                     address: string | null;
                     city: string | null;
                     gstin: string | null;
+                    deletedAt: Date | null;
                     notes: string | null;
                     contactPerson: string | null;
                     leadTimeDays: number;
                     rating: number | null;
                 };
             } & {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -447,8 +447,8 @@ export declare class OrdersController {
         })[];
         payments: ({
             recordedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
@@ -472,8 +472,8 @@ export declare class OrdersController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         contactId: string | null;
         customerName: string;
         customerPhone: string;
@@ -495,14 +495,14 @@ export declare class OrdersController {
     }>;
     updateOrder(id: string, dto: UpdateOrderDto, user: ScopedUser): Promise<{
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -525,8 +525,8 @@ export declare class OrdersController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             leadId: string | null;
             contactId: string | null;
             quoteNumber: string;
@@ -537,11 +537,6 @@ export declare class OrdersController {
             validUntil: Date;
             notes: string | null;
             terms: string | null;
-        };
-        createdBy: {
-            name: string;
-            id: string;
-            employeeCode: string;
         };
         shipments: {
             id: string;
@@ -560,8 +555,8 @@ export declare class OrdersController {
         }[];
         invoices: ({
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
             lines: {
@@ -626,31 +621,36 @@ export declare class OrdersController {
             voidedAt: Date | null;
             voidReason: string | null;
         })[];
+        createdBy: {
+            id: string;
+            name: string;
+            employeeCode: string;
+        };
         lines: ({
             sku: {
                 preferredSupplier: {
-                    email: string | null;
-                    name: string;
-                    phone: string | null;
                     id: string;
                     tenantId: string;
+                    name: string;
+                    email: string | null;
                     isActive: boolean;
                     createdById: string | null;
                     createdAt: Date;
                     updatedAt: Date;
-                    deletedAt: Date | null;
+                    phone: string | null;
                     address: string | null;
                     city: string | null;
                     gstin: string | null;
+                    deletedAt: Date | null;
                     notes: string | null;
                     contactPerson: string | null;
                     leadTimeDays: number;
                     rating: number | null;
                 };
             } & {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -678,8 +678,8 @@ export declare class OrdersController {
         })[];
         payments: ({
             recordedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
@@ -703,8 +703,8 @@ export declare class OrdersController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         contactId: string | null;
         customerName: string;
         customerPhone: string;
@@ -726,14 +726,14 @@ export declare class OrdersController {
     }>;
     recordPayment(id: string, body: RecordOrderPaymentDto, user: ScopedUser): Promise<{
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -756,8 +756,8 @@ export declare class OrdersController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             leadId: string | null;
             contactId: string | null;
             quoteNumber: string;
@@ -768,11 +768,6 @@ export declare class OrdersController {
             validUntil: Date;
             notes: string | null;
             terms: string | null;
-        };
-        createdBy: {
-            name: string;
-            id: string;
-            employeeCode: string;
         };
         shipments: {
             id: string;
@@ -791,8 +786,8 @@ export declare class OrdersController {
         }[];
         invoices: ({
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
             lines: {
@@ -857,31 +852,36 @@ export declare class OrdersController {
             voidedAt: Date | null;
             voidReason: string | null;
         })[];
+        createdBy: {
+            id: string;
+            name: string;
+            employeeCode: string;
+        };
         lines: ({
             sku: {
                 preferredSupplier: {
-                    email: string | null;
-                    name: string;
-                    phone: string | null;
                     id: string;
                     tenantId: string;
+                    name: string;
+                    email: string | null;
                     isActive: boolean;
                     createdById: string | null;
                     createdAt: Date;
                     updatedAt: Date;
-                    deletedAt: Date | null;
+                    phone: string | null;
                     address: string | null;
                     city: string | null;
                     gstin: string | null;
+                    deletedAt: Date | null;
                     notes: string | null;
                     contactPerson: string | null;
                     leadTimeDays: number;
                     rating: number | null;
                 };
             } & {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -909,8 +909,8 @@ export declare class OrdersController {
         })[];
         payments: ({
             recordedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
@@ -934,8 +934,8 @@ export declare class OrdersController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         contactId: string | null;
         customerName: string;
         customerPhone: string;
@@ -957,14 +957,14 @@ export declare class OrdersController {
     }>;
     updateStatus(id: string, dto: UpdateOrderStatusDto, user: ScopedUser): Promise<{
         contact: {
-            email: string | null;
-            name: string;
-            phone: string;
             id: string;
             tenantId: string | null;
+            name: string;
+            email: string | null;
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
+            phone: string;
             deletedAt: Date | null;
             companyId: string | null;
             designation: string | null;
@@ -987,8 +987,8 @@ export declare class OrdersController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             leadId: string | null;
             contactId: string | null;
             quoteNumber: string;
@@ -999,11 +999,6 @@ export declare class OrdersController {
             validUntil: Date;
             notes: string | null;
             terms: string | null;
-        };
-        createdBy: {
-            name: string;
-            id: string;
-            employeeCode: string;
         };
         shipments: {
             id: string;
@@ -1022,8 +1017,8 @@ export declare class OrdersController {
         }[];
         invoices: ({
             createdBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
             lines: {
@@ -1088,31 +1083,36 @@ export declare class OrdersController {
             voidedAt: Date | null;
             voidReason: string | null;
         })[];
+        createdBy: {
+            id: string;
+            name: string;
+            employeeCode: string;
+        };
         lines: ({
             sku: {
                 preferredSupplier: {
-                    email: string | null;
-                    name: string;
-                    phone: string | null;
                     id: string;
                     tenantId: string;
+                    name: string;
+                    email: string | null;
                     isActive: boolean;
                     createdById: string | null;
                     createdAt: Date;
                     updatedAt: Date;
-                    deletedAt: Date | null;
+                    phone: string | null;
                     address: string | null;
                     city: string | null;
                     gstin: string | null;
+                    deletedAt: Date | null;
                     notes: string | null;
                     contactPerson: string | null;
                     leadTimeDays: number;
                     rating: number | null;
                 };
             } & {
-                name: string;
                 id: string;
                 tenantId: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
@@ -1140,8 +1140,8 @@ export declare class OrdersController {
         })[];
         payments: ({
             recordedBy: {
-                name: string;
                 id: string;
+                name: string;
                 employeeCode: string;
             };
         } & {
@@ -1165,8 +1165,8 @@ export declare class OrdersController {
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
-        deletedAt: Date | null;
         status: string;
+        deletedAt: Date | null;
         contactId: string | null;
         customerName: string;
         customerPhone: string;
@@ -1189,11 +1189,6 @@ export declare class OrdersController {
     listShipments(user: ScopedUser, status?: string, search?: string, page?: number, limit?: number): Promise<{
         items: ({
             order: {
-                createdBy: {
-                    name: string;
-                    id: string;
-                    employeeCode: string;
-                };
                 invoices: {
                     id: string;
                     tenantId: string;
@@ -1238,11 +1233,16 @@ export declare class OrdersController {
                     voidedAt: Date | null;
                     voidReason: string | null;
                 }[];
+                createdBy: {
+                    id: string;
+                    name: string;
+                    employeeCode: string;
+                };
                 lines: ({
                     sku: {
-                        name: string;
                         id: string;
                         tenantId: string;
+                        name: string;
                         createdAt: Date;
                         updatedAt: Date;
                         deletedAt: Date | null;
@@ -1274,8 +1274,8 @@ export declare class OrdersController {
                 createdById: string | null;
                 createdAt: Date;
                 updatedAt: Date;
-                deletedAt: Date | null;
                 status: string;
+                deletedAt: Date | null;
                 contactId: string | null;
                 customerName: string;
                 customerPhone: string;
@@ -1337,8 +1337,8 @@ export declare class OrdersController {
             createdById: string | null;
             createdAt: Date;
             updatedAt: Date;
-            deletedAt: Date | null;
             status: string;
+            deletedAt: Date | null;
             contactId: string | null;
             customerName: string;
             customerPhone: string;
