@@ -156,7 +156,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "selectCompany", null);
 __decorate([
-    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 900000 } }),
+    (0, throttler_1.Throttle)({ default: { limit: 15, ttl: 900000 } }),
     (0, common_1.Post)('forgot-password'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),

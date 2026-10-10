@@ -16,6 +16,7 @@ const platform_auth_controller_1 = require("./platform-auth.controller");
 const jwt_strategy_1 = require("./jwt.strategy");
 const roles_guard_1 = require("./roles.guard");
 const scoping_service_1 = require("./scoping.service");
+const notifications_module_1 = require("../notifications/notifications.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -27,6 +28,7 @@ exports.AuthModule = AuthModule = __decorate([
                 secret: process.env.JWT_SECRET,
                 signOptions: { expiresIn: process.env.JWT_EXPIRATION || '1d' },
             }),
+            (0, common_1.forwardRef)(() => notifications_module_1.NotificationsModule),
         ],
         controllers: [auth_controller_1.AuthController, platform_auth_controller_1.PlatformAuthController],
         providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, roles_guard_1.RolesGuard, scoping_service_1.ScopingService],

@@ -42,6 +42,7 @@ export declare class NotificationsService {
         recipient: string;
         messageId: any;
         status: string;
+        errorMessage: string;
     }>;
     createInAppTask(options: CreateInAppTaskOptions): Promise<{
         success: boolean;

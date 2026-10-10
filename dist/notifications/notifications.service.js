@@ -45,11 +45,17 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
                         host: mailAccount.smtpHost,
                         port: mailAccount.smtpPort,
                         secure: mailAccount.isSecure || mailAccount.smtpPort === 465,
+                        pool: true,
+                        maxConnections: 5,
+                        maxMessages: 100,
                         auth: {
                             user: mailAccount.smtpUser,
                             pass: (0, encryption_util_1.decryptAtRest)(mailAccount.smtpPass) || mailAccount.smtpPass,
                         },
                         tls: { rejectUnauthorized: false },
+                        connectionTimeout: 5000,
+                        greetingTimeout: 5000,
+                        socketTimeout: 8000,
                     });
                     this.transporterCache.set(cacheKey, transporter);
                 }
@@ -72,8 +78,14 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
                     host,
                     port,
                     secure: port === 465,
+                    pool: true,
+                    maxConnections: 5,
+                    maxMessages: 100,
                     auth: { user: primaryUser, pass: primaryPass },
                     tls: { rejectUnauthorized: false },
+                    connectionTimeout: 5000,
+                    greetingTimeout: 5000,
+                    socketTimeout: 8000,
                 });
                 this.transporterCache.set('default_root_smtp', transporter);
             }
@@ -193,10 +205,13 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
                 relatedEntityId: options.relatedEntityId,
             },
         });
-        if (status === 'failed') {
-            throw new common_1.BadRequestException(errorMessage || `Failed to deliver email to ${options.to}`);
-        }
-        return { success: true, recipient: options.to, messageId: transportInfo?.messageId, status };
+        return {
+            success: status === 'sent',
+            recipient: options.to,
+            messageId: transportInfo?.messageId || null,
+            status,
+            errorMessage,
+        };
     }
     async createInAppTask(options) {
         const tenantId = options.tenantId || 'unassigned';

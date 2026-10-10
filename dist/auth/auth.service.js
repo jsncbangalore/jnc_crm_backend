@@ -387,7 +387,7 @@ let AuthService = class AuthService {
             .catch(() => { });
         const rawToken = crypto.randomBytes(32).toString('hex');
         const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
-        const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
         await this.prisma.passwordResetToken.create({
             data: { userId: user.id, tokenHash, expiresAt },
         });
@@ -399,10 +399,11 @@ let AuthService = class AuthService {
             console.log(`[DEV] Password reset link for ${lower}: ${resetUrl}`);
         }
         if (this.notificationsService) {
-            await this.notificationsService.sendEmail({
+            this.notificationsService.sendEmail({
                 to: user.email,
                 tenantId: user.tenantId || undefined,
                 subject: 'Reset Your JNC CRM Password',
+                text: `Hello ${user.name || 'User'},\n\nWe received a request to reset your password for your JNC CRM account.\n\nPlease copy and paste this link into your browser to reset your password:\n${resetUrl}\n\nThis link is valid for 24 hours. If you did not request this, you can safely ignore this message.`,
                 html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #ffffff;">
           <h2 style="color: #1e293b; margin-top: 0;">JNC CRM Password Reset</h2>
           <p style="color: #475569; font-size: 15px;">Hello <strong>${user.name || 'User'}</strong>,</p>
@@ -412,7 +413,7 @@ let AuthService = class AuthService {
           </p>
           <p style="color: #64748b; font-size: 13px;">Or copy and paste this link into your browser:<br><a href="${resetUrl}" style="color: #2563eb;">${resetUrl}</a></p>
           <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
-          <p style="color: #94a3b8; font-size: 12px; margin: 0;">This link is valid for 30 minutes. If you did not request this, you can safely ignore this message.</p>
+          <p style="color: #94a3b8; font-size: 12px; margin: 0;">This link is valid for 24 hours. If you did not request this, you can safely ignore this message.</p>
         </div>`,
             }).catch((err) => console.error('[AUTH FORGOT PASSWORD EMAIL ERROR]', err));
         }
@@ -801,7 +802,7 @@ let AuthService = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, common_1.Optional)()),
+    __param(2, (0, common_1.Inject)((0, common_1.forwardRef)(() => notifications_service_1.NotificationsService))),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         jwt_1.JwtService,
         notifications_service_1.NotificationsService])

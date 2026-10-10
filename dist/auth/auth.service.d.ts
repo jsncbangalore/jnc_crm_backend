@@ -6,12 +6,12 @@ export declare function formatAuthUser(user: any): any;
 export declare class AuthService {
     private prisma;
     private jwtService;
-    private notificationsService?;
+    private notificationsService;
     private readonly MAX_FAILED_ATTEMPTS;
     private readonly LOCKOUT_DURATION_MS;
     private readonly PLATFORM_MAX_ATTEMPTS;
     private readonly PLATFORM_WINDOW_MS;
-    constructor(prisma: PrismaService, jwtService: JwtService, notificationsService?: NotificationsService);
+    constructor(prisma: PrismaService, jwtService: JwtService, notificationsService: NotificationsService);
     private checkAccountLockout;
     private recordFailedAttempt;
     private resetFailedAttempts;
