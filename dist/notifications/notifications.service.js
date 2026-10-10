@@ -149,6 +149,56 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
         const anyTenant = await this.prisma.tenant.findFirst({ select: { id: true } });
         return anyTenant?.id || '';
     }
+    async sendViaResend(apiKey, options, defaultFrom, displayName) {
+        return new Promise((resolve) => {
+            const https = require('https');
+            const configuredFrom = process.env.RESEND_FROM || defaultFrom;
+            let fromAddr = 'JNC CRM <onboarding@resend.dev>';
+            if (configuredFrom && !configuredFrom.toLowerCase().includes('@gmail.com')) {
+                fromAddr = configuredFrom.includes('<') ? configuredFrom : `"${displayName || 'JNC CRM'}" <${configuredFrom}>`;
+            }
+            const payload = JSON.stringify({
+                from: fromAddr,
+                to: Array.isArray(options.to) ? options.to : [options.to],
+                subject: options.subject,
+                html: options.html || undefined,
+                text: options.text || undefined,
+            });
+            const req = https.request({
+                hostname: 'api.resend.com',
+                path: '/emails',
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey.trim()}`,
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(payload),
+                },
+                timeout: 10000,
+            }, (res) => {
+                let resBody = '';
+                res.on('data', (d) => resBody += d);
+                res.on('end', () => {
+                    try {
+                        const parsed = JSON.parse(resBody);
+                        if (res.statusCode >= 200 && res.statusCode < 300) {
+                            resolve({ success: true, messageId: parsed.id });
+                        } else {
+                            resolve({ success: false, errorMessage: parsed.message || `Resend error (${res.statusCode})` });
+                        }
+                    } catch (e) {
+                        resolve({ success: false, errorMessage: `Resend parse error (${res.statusCode})` });
+                    }
+                });
+            });
+            req.on('error', (err) => resolve({ success: false, errorMessage: err.message || 'Resend network error' }));
+            req.on('timeout', () => {
+                req.destroy();
+                resolve({ success: false, errorMessage: 'Resend request timeout' });
+            });
+            req.write(payload);
+            req.end();
+        });
+    }
     async sendEmail(options) {
         const tenantId = await this.resolveNotificationTenantId(options.tenantId);
         const isInvoice = options.senderType === 'invoice' || options.relatedEntityType === 'invoice';
@@ -160,35 +210,53 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
         let status = 'failed';
         let errorMessage = null;
         let transportInfo = null;
-        if (!transporter) {
-            this.logger.warn(`No SMTP account registered for tenant ${tenantId}. Message logged without outward SMTP transmission.`);
-            status = 'queued';
-            errorMessage = 'No tenant SMTP account configured. Message stored in in-app log.';
+        const resendApiKey = process.env.RESEND_API_KEY;
+        if (resendApiKey && resendApiKey.trim()) {
+            this.logger.log(`[RESEND DISPATCH] Sending to ${options.to} via Resend HTTPS API`);
+            const resendResult = await this.sendViaResend(resendApiKey, options, fromAddress, senderDisplayName);
+            if (resendResult.success) {
+                status = 'sent';
+                transportInfo = { messageId: resendResult.messageId };
+                this.logger.log(`[RESEND SUCCESS] MessageId: ${resendResult.messageId} | To: ${options.to}`);
+            } else {
+                this.logger.warn(`[RESEND FAILED] ${resendResult.errorMessage}. Falling back to SMTP...`);
+                errorMessage = resendResult.errorMessage;
+            }
         }
-        else {
-            try {
-                transportInfo = await transporter.sendMail({
-                    from: `"${senderDisplayName}" <${fromAddress}>`,
-                    to: options.to,
-                    subject: options.subject,
-                    html: options.html,
-                    text: options.text,
-                    attachments: options.attachments,
-                });
-                if (transportInfo && (transportInfo.accepted?.length > 0 || transportInfo.messageId)) {
-                    status = 'sent';
-                    this.logger.log(`[EMAIL DISPATCH SUCCESS] MessageId: ${transportInfo.messageId} | To: ${options.to}`);
-                }
-                else {
-                    status = 'failed';
-                    errorMessage = `SMTP server rejected recipient: ${JSON.stringify(transportInfo?.rejected || 'Unknown rejection')}`;
-                    this.logger.error(errorMessage);
+        if (status !== 'sent') {
+            if (!transporter) {
+                if (!errorMessage) {
+                    this.logger.warn(`No SMTP account registered for tenant ${tenantId}. Message logged without outward SMTP transmission.`);
+                    status = 'queued';
+                    errorMessage = 'No tenant SMTP account configured. Message stored in in-app log.';
                 }
             }
-            catch (err) {
-                this.logger.error(`Failed to send email to ${options.to}: ${err.message}`);
-                status = 'failed';
-                errorMessage = err.message || 'SMTP network or authentication failure';
+            else {
+                try {
+                    transportInfo = await transporter.sendMail({
+                        from: `"${senderDisplayName}" <${fromAddress}>`,
+                        to: options.to,
+                        subject: options.subject,
+                        html: options.html,
+                        text: options.text,
+                        attachments: options.attachments,
+                    });
+                    if (transportInfo && (transportInfo.accepted?.length > 0 || transportInfo.messageId)) {
+                        status = 'sent';
+                        errorMessage = null;
+                        this.logger.log(`[EMAIL DISPATCH SUCCESS] MessageId: ${transportInfo.messageId} | To: ${options.to}`);
+                    }
+                    else {
+                        status = 'failed';
+                        errorMessage = `SMTP server rejected recipient: ${JSON.stringify(transportInfo?.rejected || 'Unknown rejection')}`;
+                        this.logger.error(errorMessage);
+                    }
+                }
+                catch (err) {
+                    this.logger.error(`Failed to send email to ${options.to}: ${err.message}`);
+                    status = 'failed';
+                    errorMessage = err.message || 'SMTP network or authentication failure';
+                }
             }
         }
         const sanitizedBody = this.sanitizeBodyForLog(options.html || options.text || '');

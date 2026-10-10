@@ -48,24 +48,27 @@ let NotificationsController = class NotificationsController {
         return this.notificationsService.syncGoDaddyInbox();
     }
     async handleInboundEmail(body) {
-        const fromEmail = body.from || 'client@example.com';
+        const emailData = body.data || body;
+        const fromEmail = emailData.from || body.from || 'client@example.com';
         const cleanFrom = fromEmail.replace(/.*<([^>]+)>.*/, '$1').trim();
         const lead = await this.prisma.lead.findFirst({
             where: {
                 OR: [
                     { customerEmail: { equals: cleanFrom } },
                     body.leadNumber ? { leadNumber: { equals: body.leadNumber } } : undefined,
+                    emailData.subject ? { leadNumber: { equals: emailData.subject } } : undefined,
                 ].filter(Boolean),
                 deletedAt: null,
             },
             include: { assignedTo: true },
         });
-        const content = body.text || body.html || 'Customer email reply received.';
+        const content = emailData.html || emailData.text || body.text || body.html || 'Customer email reply received.';
+        const subject = emailData.subject || body.subject || `Inbound message from ${cleanFrom}`;
         const messageLog = await this.prisma.messageLog.create({
             data: {
                 channel: 'email_inbound',
-                recipient: 'jayaraj@jsnc.co.in',
-                subject: body.subject || `Reply from ${cleanFrom}`,
+                recipient: Array.isArray(emailData.to) ? emailData.to.join(', ') : (emailData.to || 'jayaraj@jsnc.co.in'),
+                subject,
                 body: content,
                 status: 'received',
                 relatedEntityType: lead ? 'lead' : undefined,

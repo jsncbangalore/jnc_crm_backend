@@ -38,6 +38,8 @@ exports.ENV_CATALOG = [
     { key: 'ALLOWED_DB_HOSTS', category: 'OPTIONAL', description: 'Whitelist of allowed database hostnames in maintenance scripts' },
     { key: 'ALLOWED_DB_PROJECT_REFS', category: 'OPTIONAL', description: 'Whitelist of allowed Supabase project references in scripts' },
     { key: 'BLOCKED_DB_PROJECT_REFS', category: 'OPTIONAL', description: 'Blacklist of Supabase project references to protect against accidental writes' },
+    { key: 'RESEND_API_KEY', category: 'OPTIONAL', description: 'Resend HTTPS API token for email dispatch', isSecret: true },
+    { key: 'RESEND_FROM', category: 'OPTIONAL', description: 'Sender address for Resend email dispatch' },
     { key: 'CONFIRM_PRODUCTION', category: 'OPTIONAL', description: 'Requires "yes" before running destructive production scripts' },
     { key: 'OWNER_EMAIL', category: 'OPTIONAL', description: 'Real mailbox for owner account (used by owner:reset & prod:bootstrap)' },
     { key: 'OWNER_PASSWORD', category: 'OPTIONAL', description: 'Initial or override password for owner account in scripts', isSecret: true },
