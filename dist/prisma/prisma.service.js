@@ -31,7 +31,12 @@ let PrismaService = class PrismaService extends client_1.PrismaClient {
             }
             return next(params);
         });
-        await this.$connect();
+        try {
+            await this.$connect();
+        }
+        catch (err) {
+            console.warn(`[PrismaService] Deferred connection on startup: ${err.message}`);
+        }
     }
     async onModuleDestroy() {
         await this.$disconnect();

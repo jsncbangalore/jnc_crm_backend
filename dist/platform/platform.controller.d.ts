@@ -1,4 +1,5 @@
 import { PlatformService, CreateTenantDto, UpdateTenantDto } from './platform.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { ResetTenantAdminPasswordDto, CreatePlatformAdminDto, TogglePlatformAdminActiveDto } from './dto/platform-admin.dto';
 export declare class PlatformController {
     private readonly platformService;
@@ -372,4 +373,11 @@ export declare class PlatformAdminsController {
     deletePlatformAdmin(id: string): Promise<{
         message: string;
     }>;
+}
+export declare function checkMailTestRateLimit(key: string): boolean;
+export declare function resetMailTestRateLimit(key?: string): void;
+export declare class PlatformMailTestController {
+    private readonly notificationsService;
+    constructor(notificationsService: NotificationsService);
+    sendMailTest(user: any, req: any): Promise<import("../notifications/notifications.service").MailTestResult>;
 }

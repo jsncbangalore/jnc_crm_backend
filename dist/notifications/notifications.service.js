@@ -22,6 +22,20 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
         this.logger = new common_1.Logger(NotificationsService_1.name);
         this.transporterCache = new Map();
     }
+    getMailProvider() {
+        const raw = (process.env.MAIL_PROVIDER || '').trim().toLowerCase();
+        if (raw === 'brevo')
+            return 'brevo';
+        if (raw === 'resend')
+            return 'resend';
+        if (raw === 'smtp')
+            return 'smtp';
+        if (process.env.RESEND_API_KEY)
+            return 'resend';
+        if (process.env.BREVO_API_KEY)
+            return 'brevo';
+        return 'smtp';
+    }
     async getTenantTransporter(tenantId, senderType = 'primary') {
         const targetTenantId = tenantId;
         if (targetTenantId) {
@@ -63,11 +77,13 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
                     transporter,
                     fromEmail: mailAccount.email,
                     senderName: mailAccount.senderName || mailAccount.name,
+                    isCustomTenantAccount: true,
                 };
             }
         }
         const primaryUser = process.env.SMTP_USER || '';
         const primaryPass = process.env.SMTP_PASS || '';
+        const primaryFrom = process.env.EMAIL_FROM || process.env.PRIMARY_EMAIL_FROM || primaryUser || 'noreply@jsnc.co.in';
         if (primaryUser && primaryPass) {
             const isGmail = primaryUser.toLowerCase().includes('@gmail.com');
             const host = process.env.SMTP_HOST || (isGmail ? 'smtp.gmail.com' : 'smtpout.secureserver.net');
@@ -89,21 +105,94 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
                 });
                 this.transporterCache.set('default_root_smtp', transporter);
             }
-            const primaryFrom = process.env.EMAIL_FROM || process.env.SMTP_FROM || primaryUser;
-            if (process.env.SMTP_FROM && !process.env.EMAIL_FROM) {
-                this.logger.warn("[ENV WARNING] 'SMTP_FROM' is deprecated, please use canonical 'EMAIL_FROM'.");
-            }
             return {
                 transporter,
                 fromEmail: primaryFrom,
                 senderName: brand_1.BRAND_CONFIG.displayName,
+                isCustomTenantAccount: false,
             };
         }
         return {
             transporter: null,
-            fromEmail: 'noreply@jsnc.co.in',
-            senderName: 'System Notification',
+            fromEmail: primaryFrom,
+            senderName: brand_1.BRAND_CONFIG.displayName,
+            isCustomTenantAccount: false,
         };
+    }
+    async sendViaBrevo(options, fromEmail, senderName) {
+        const apiKey = process.env.BREVO_API_KEY;
+        if (!apiKey || !apiKey.trim()) {
+            return { success: false, error: 'BREVO_API_KEY environment variable is not configured' };
+        }
+        const payload = {
+            sender: { name: senderName, email: fromEmail },
+            to: [{ email: options.to }],
+            subject: options.subject,
+            htmlContent: options.html,
+            textContent: options.text || undefined,
+        };
+        try {
+            const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+                method: 'POST',
+                headers: {
+                    'api-key': apiKey.trim(),
+                    'accept': 'application/json',
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && (data.messageId || data.messageIds)) {
+                return { success: true, messageId: data.messageId || (data.messageIds && data.messageIds[0]) || 'brevo-sent' };
+            }
+            const errMsg = data.message || data.code || `Brevo HTTP ${res.status}`;
+            return { success: false, error: errMsg };
+        }
+        catch (err) {
+            return { success: false, error: err.message || 'Brevo HTTPS network request failed' };
+        }
+    }
+    async sendViaResend(options, fromEmail, senderName) {
+        const apiKey = process.env.RESEND_API_KEY;
+        if (!apiKey || !apiKey.trim()) {
+            return { success: false, error: 'RESEND_API_KEY environment variable is not configured' };
+        }
+        const configuredFrom = process.env.RESEND_FROM;
+        let effectiveFrom = configuredFrom || fromEmail || 'crm@admin.jsnc.co.in';
+        if (effectiveFrom.toLowerCase().includes('@gmail.com')) {
+            effectiveFrom = configuredFrom || 'crm@admin.jsnc.co.in';
+        }
+        const fromFormatted = effectiveFrom.includes('<')
+            ? effectiveFrom
+            : `"${senderName || 'JNC CRM'}" <${effectiveFrom}>`;
+        const replyTo = process.env.REPLY_TO || process.env.EMAIL_FROM || 'jsnccrm@gmail.com';
+        const payload = {
+            from: fromFormatted,
+            to: Array.isArray(options.to) ? options.to : [options.to],
+            subject: options.subject,
+            html: options.html,
+            text: options.text || undefined,
+            reply_to: replyTo,
+        };
+        try {
+            const res = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey.trim()}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.id) {
+                return { success: true, messageId: data.id };
+            }
+            const errMsg = data.message || data.name || `Resend HTTP ${res.status}`;
+            return { success: false, error: errMsg };
+        }
+        catch (err) {
+            return { success: false, error: err.message || 'Resend HTTPS network request failed' };
+        }
     }
     sanitizeBodyForLog(rawBody) {
         if (!rawBody)
@@ -149,115 +238,107 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
         const anyTenant = await this.prisma.tenant.findFirst({ select: { id: true } });
         return anyTenant?.id || '';
     }
-    async sendViaResend(apiKey, options, defaultFrom, displayName) {
-        return new Promise((resolve) => {
-            const https = require('https');
-            const configuredFrom = process.env.RESEND_FROM || defaultFrom;
-            let fromAddr = 'JNC CRM <onboarding@resend.dev>';
-            if (configuredFrom && !configuredFrom.toLowerCase().includes('@gmail.com')) {
-                fromAddr = configuredFrom.includes('<') ? configuredFrom : `"${displayName || 'JNC CRM'}" <${configuredFrom}>`;
-            }
-            const replyTo = process.env.REPLY_TO || process.env.EMAIL_FROM || 'jsnccrm@gmail.com';
-            const payload = JSON.stringify({
-                from: fromAddr,
-                to: Array.isArray(options.to) ? options.to : [options.to],
-                subject: options.subject,
-                html: options.html || undefined,
-                text: options.text || undefined,
-                reply_to: replyTo,
-            });
-            const req = https.request({
-                hostname: 'api.resend.com',
-                path: '/emails',
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey.trim()}`,
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(payload),
-                },
-                timeout: 10000,
-            }, (res) => {
-                let resBody = '';
-                res.on('data', (d) => resBody += d);
-                res.on('end', () => {
-                    try {
-                        const parsed = JSON.parse(resBody);
-                        if (res.statusCode >= 200 && res.statusCode < 300) {
-                            resolve({ success: true, messageId: parsed.id });
-                        } else {
-                            resolve({ success: false, errorMessage: parsed.message || `Resend error (${res.statusCode})` });
-                        }
-                    } catch (e) {
-                        resolve({ success: false, errorMessage: `Resend parse error (${res.statusCode})` });
-                    }
-                });
-            });
-            req.on('error', (err) => resolve({ success: false, errorMessage: err.message || 'Resend network error' }));
-            req.on('timeout', () => {
-                req.destroy();
-                resolve({ success: false, errorMessage: 'Resend request timeout' });
-            });
-            req.write(payload);
-            req.end();
-        });
-    }
     async sendEmail(options) {
         const tenantId = await this.resolveNotificationTenantId(options.tenantId);
         const isInvoice = options.senderType === 'invoice' || options.relatedEntityType === 'invoice';
         const branding = await this.getBranding(tenantId);
-        const { transporter, fromEmail, senderName } = await this.getTenantTransporter(tenantId, isInvoice ? 'invoice' : (options.senderType || 'primary'));
-        const fromAddress = options.from || fromEmail;
-        const senderDisplayName = options.from ? branding.companyDisplayName : senderName;
-        this.logger.log(`[TENANT EMAIL] Tenant: ${tenantId} | From: ${fromAddress} | To: ${options.to} | Subject: ${options.subject}`);
+        const reqId = options.requestId || 'no-req-id';
+        const tenantTransporterInfo = await this.getTenantTransporter(tenantId, isInvoice ? 'invoice' : (options.senderType || 'primary'));
+        const fromEmail = options.from || process.env.EMAIL_FROM || process.env.PRIMARY_EMAIL_FROM || tenantTransporterInfo.fromEmail;
+        const senderName = options.from ? branding.companyDisplayName : tenantTransporterInfo.senderName;
+        const mailProvider = this.getMailProvider();
         let status = 'failed';
         let errorMessage = null;
-        let transportInfo = null;
-        const resendApiKey = process.env.RESEND_API_KEY;
-        if (resendApiKey && resendApiKey.trim()) {
-            this.logger.log(`[RESEND DISPATCH] Sending to ${options.to} via Resend HTTPS API`);
-            const resendResult = await this.sendViaResend(resendApiKey, options, fromAddress, senderDisplayName);
-            if (resendResult.success) {
-                status = 'sent';
-                transportInfo = { messageId: resendResult.messageId };
-                this.logger.log(`[RESEND SUCCESS] MessageId: ${resendResult.messageId} | To: ${options.to}`);
-            } else {
-                this.logger.warn(`[RESEND FAILED] ${resendResult.errorMessage}. Falling back to SMTP...`);
-                errorMessage = resendResult.errorMessage;
+        let messageId = null;
+        let providerUsed = mailProvider;
+        if (tenantTransporterInfo.isCustomTenantAccount && tenantTransporterInfo.transporter) {
+            providerUsed = 'smtp-tenant';
+            try {
+                const info = await tenantTransporterInfo.transporter.sendMail({
+                    from: `"${senderName}" <${fromEmail}>`,
+                    to: options.to,
+                    subject: options.subject,
+                    html: options.html,
+                    text: options.text,
+                    attachments: options.attachments,
+                });
+                if (info && (info.accepted?.length > 0 || info.messageId)) {
+                    status = 'sent';
+                    messageId = info.messageId;
+                    this.logger.log(`[MAIL DISPATCH SUCCESS] ReqId: ${reqId} | Provider: smtp-tenant | To: ${options.to} | MessageId: ${messageId}`);
+                }
+                else {
+                    status = 'failed';
+                    errorMessage = 'Tenant SMTP rejected recipient';
+                    this.logger.error(`[MAIL ERROR] ReqId: ${reqId} | Provider: smtp-tenant | To: ${options.to} | Reason: ${errorMessage}`);
+                }
+            }
+            catch (err) {
+                status = 'failed';
+                errorMessage = err.message || 'Tenant SMTP connection failed';
+                this.logger.error(`[MAIL ERROR] ReqId: ${reqId} | Provider: smtp-tenant | To: ${options.to} | Reason: ${errorMessage}`);
             }
         }
-        if (status !== 'sent') {
-            if (!transporter) {
-                if (!errorMessage) {
-                    this.logger.warn(`No SMTP account registered for tenant ${tenantId}. Message logged without outward SMTP transmission.`);
-                    status = 'queued';
-                    errorMessage = 'No tenant SMTP account configured. Message stored in in-app log.';
-                }
+        else if (mailProvider === 'brevo') {
+            const result = await this.sendViaBrevo(options, fromEmail, senderName);
+            if (result.success) {
+                status = 'sent';
+                messageId = result.messageId || null;
+                this.logger.log(`[MAIL DISPATCH SUCCESS] ReqId: ${reqId} | Provider: brevo | To: ${options.to} | MessageId: ${messageId}`);
+            }
+            else {
+                status = 'failed';
+                errorMessage = result.error || 'Brevo API sending failed';
+                this.logger.error(`[MAIL ERROR] ReqId: ${reqId} | Provider: brevo | To: ${options.to} | Reason: ${errorMessage}`);
+            }
+        }
+        else if (mailProvider === 'resend') {
+            const result = await this.sendViaResend(options, fromEmail, senderName);
+            if (result.success) {
+                status = 'sent';
+                messageId = result.messageId || null;
+                this.logger.log(`[MAIL DISPATCH SUCCESS] ReqId: ${reqId} | Provider: resend | To: ${options.to} | MessageId: ${messageId}`);
+            }
+            else {
+                status = 'failed';
+                errorMessage = result.error || 'Resend API sending failed';
+                this.logger.error(`[MAIL ERROR] ReqId: ${reqId} | Provider: resend | To: ${options.to} | Reason: ${errorMessage}`);
+            }
+        }
+        else {
+            if (!tenantTransporterInfo.transporter) {
+                const isMissingPass = !process.env.SMTP_PASS;
+                status = 'queued';
+                errorMessage = isMissingPass
+                    ? 'SMTP_PASS missing in server environment variables. Configure SMTP_PASS or set MAIL_PROVIDER=brevo/resend.'
+                    : 'No system SMTP transporter configured.';
+                this.logger.warn(`[MAIL ERROR] ReqId: ${reqId} | Provider: smtp | To: ${options.to} | Reason: ${errorMessage}`);
             }
             else {
                 try {
-                    transportInfo = await transporter.sendMail({
-                        from: `"${senderDisplayName}" <${fromAddress}>`,
+                    const info = await tenantTransporterInfo.transporter.sendMail({
+                        from: `"${senderName}" <${fromEmail}>`,
                         to: options.to,
                         subject: options.subject,
                         html: options.html,
                         text: options.text,
                         attachments: options.attachments,
                     });
-                    if (transportInfo && (transportInfo.accepted?.length > 0 || transportInfo.messageId)) {
+                    if (info && (info.accepted?.length > 0 || info.messageId)) {
                         status = 'sent';
-                        errorMessage = null;
-                        this.logger.log(`[EMAIL DISPATCH SUCCESS] MessageId: ${transportInfo.messageId} | To: ${options.to}`);
+                        messageId = info.messageId;
+                        this.logger.log(`[MAIL DISPATCH SUCCESS] ReqId: ${reqId} | Provider: smtp | To: ${options.to} | MessageId: ${messageId}`);
                     }
                     else {
                         status = 'failed';
-                        errorMessage = `SMTP server rejected recipient: ${JSON.stringify(transportInfo?.rejected || 'Unknown rejection')}`;
-                        this.logger.error(errorMessage);
+                        errorMessage = 'System SMTP rejected recipient';
+                        this.logger.error(`[MAIL ERROR] ReqId: ${reqId} | Provider: smtp | To: ${options.to} | Reason: ${errorMessage}`);
                     }
                 }
                 catch (err) {
-                    this.logger.error(`Failed to send email to ${options.to}: ${err.message}`);
                     status = 'failed';
-                    errorMessage = err.message || 'SMTP network or authentication failure';
+                    errorMessage = err.message || 'System SMTP connection failed';
+                    this.logger.error(`[MAIL ERROR] ReqId: ${reqId} | Provider: smtp | To: ${options.to} | Reason: ${errorMessage}`);
                 }
             }
         }
@@ -274,14 +355,43 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
                 relatedEntityType: options.relatedEntityType,
                 relatedEntityId: options.relatedEntityId,
             },
-        });
-        return {
-            success: status === 'sent',
-            recipient: options.to,
-            messageId: transportInfo?.messageId || null,
-            status,
-            errorMessage,
-        };
+        }).catch(() => { });
+        if (status === 'failed') {
+            throw new common_1.BadRequestException(errorMessage || `Failed to deliver email to ${options.to}`);
+        }
+        return { success: true, recipient: options.to, messageId, status, provider: providerUsed };
+    }
+    async sendTestMail(targetEmail, requestId) {
+        const provider = this.getMailProvider();
+        const testSubject = `[JNC CRM] Mail Provider Test (${provider.toUpperCase()})`;
+        const testHtml = `
+      <div style="font-family: sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2>Mail Provider Operational Test</h2>
+        <p>This test email was sent using provider: <strong>${provider.toUpperCase()}</strong>.</p>
+        <p>Time: ${new Date().toISOString()}</p>
+      </div>
+    `;
+        try {
+            const res = await this.sendEmail({
+                to: targetEmail,
+                subject: testSubject,
+                html: testHtml,
+                text: `Mail Provider Test (${provider.toUpperCase()}) - ${new Date().toISOString()}`,
+                requestId,
+            });
+            return {
+                provider,
+                status: 'sent',
+                messageId: res.messageId || undefined,
+            };
+        }
+        catch (err) {
+            return {
+                provider,
+                status: 'failed',
+                errorText: err.message || 'Test email dispatch failed',
+            };
+        }
     }
     async createInAppTask(options) {
         const tenantId = options.tenantId || 'unassigned';
@@ -298,18 +408,6 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
                     isCompleted: false,
                 },
             });
-            await this.prisma.messageLog.create({
-                data: {
-                    tenantId,
-                    channel: 'in_app',
-                    recipient: options.userId || 'Unassigned',
-                    subject: options.title,
-                    body: options.description || options.title,
-                    status: 'sent',
-                    relatedEntityType: 'lead',
-                    relatedEntityId: options.leadId,
-                },
-            });
             return { success: true };
         }
         catch (err) {
@@ -317,13 +415,13 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
             return { success: false, error: err.message };
         }
     }
-    async sendSms(phone, text) {
-        this.logger.log(`[SMS DISPATCH] Simulated SMS to ${phone}: ${text}`);
-        return { success: true };
+    async sendSms(phone, message) {
+        this.logger.log(`[SMS DISPATCH] To: ${phone} | Content: ${message.slice(0, 50)}...`);
+        return { success: true, status: 'sent' };
     }
     async syncGoDaddyInbox() {
-        this.logger.log(`[IMAP SYNC] Synchronizing inbox`);
-        return { message: 'Inbox synchronized successfully', count: 0 };
+        this.logger.log(`[GODADDY SYNC] Syncing GoDaddy IMAP inbox...`);
+        return { success: true, syncedCount: 0 };
     }
 };
 exports.NotificationsService = NotificationsService;

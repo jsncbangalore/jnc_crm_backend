@@ -64,10 +64,11 @@ let NotificationsController = class NotificationsController {
         });
         const content = emailData.html || emailData.text || body.text || body.html || 'Customer email reply received.';
         const subject = emailData.subject || body.subject || `Inbound message from ${cleanFrom}`;
+        const recipient = Array.isArray(emailData.to) ? emailData.to.join(', ') : (emailData.to || 'jayaraj@jsnc.co.in');
         const messageLog = await this.prisma.messageLog.create({
             data: {
                 channel: 'email_inbound',
-                recipient: Array.isArray(emailData.to) ? emailData.to.join(', ') : (emailData.to || 'jayaraj@jsnc.co.in'),
+                recipient,
                 subject,
                 body: content,
                 status: 'received',
@@ -81,7 +82,7 @@ let NotificationsController = class NotificationsController {
                     leadId: lead.id,
                     userId: lead.assignedToId || undefined,
                     type: 'email',
-                    title: `Customer Email Reply: ${body.subject || 'No Subject'}`,
+                    title: `Customer Email Reply: ${subject}`,
                     description: content,
                     isCompleted: true,
                     completedAt: new Date(),

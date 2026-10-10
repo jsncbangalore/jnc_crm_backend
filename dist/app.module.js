@@ -31,6 +31,7 @@ const backup_module_1 = require("./backup/backup.module");
 const settings_module_1 = require("./settings/settings.module");
 const activities_module_1 = require("./activities/activities.module");
 const platform_module_1 = require("./platform/platform.module");
+const health_controller_1 = require("./health/health.controller");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -66,6 +67,7 @@ exports.AppModule = AppModule = __decorate([
             activities_module_1.ActivitiesModule,
             platform_module_1.PlatformModule,
         ],
+        controllers: [health_controller_1.HealthController],
         providers: [
             {
                 provide: core_1.APP_GUARD,

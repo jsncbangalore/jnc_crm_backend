@@ -7,6 +7,7 @@ export interface SendEmailOptions {
     from?: string;
     tenantId?: string;
     senderType?: 'primary' | 'invoice' | 'sales';
+    requestId?: string;
     attachments?: Array<{
         filename: string;
         content?: any;
@@ -24,12 +25,21 @@ export interface CreateInAppTaskOptions {
     description?: string;
     scheduledAt?: Date;
 }
+export interface MailTestResult {
+    provider: string;
+    status: 'sent' | 'failed';
+    errorText?: string;
+    messageId?: string;
+}
 export declare class NotificationsService {
     private prisma;
     private readonly logger;
     private transporterCache;
     constructor(prisma: PrismaService);
+    getMailProvider(): 'smtp' | 'brevo' | 'resend';
     private getTenantTransporter;
+    private sendViaBrevo;
+    private sendViaResend;
     private sanitizeBodyForLog;
     getBranding(tenantId?: string): Promise<{
         companyDisplayName: string;
@@ -40,10 +50,11 @@ export declare class NotificationsService {
     sendEmail(options: SendEmailOptions): Promise<{
         success: boolean;
         recipient: string;
-        messageId: any;
+        messageId: string;
         status: string;
-        errorMessage: string;
+        provider: string;
     }>;
+    sendTestMail(targetEmail: string, requestId?: string): Promise<MailTestResult>;
     createInAppTask(options: CreateInAppTaskOptions): Promise<{
         success: boolean;
         error?: undefined;
@@ -51,11 +62,12 @@ export declare class NotificationsService {
         success: boolean;
         error: any;
     }>;
-    sendSms(phone: string, text: string): Promise<{
+    sendSms(phone: string, message: string): Promise<{
         success: boolean;
+        status: string;
     }>;
     syncGoDaddyInbox(): Promise<{
-        message: string;
-        count: number;
+        success: boolean;
+        syncedCount: number;
     }>;
 }

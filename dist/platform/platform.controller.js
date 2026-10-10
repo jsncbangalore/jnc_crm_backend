@@ -12,9 +12,12 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PlatformAdminsController = exports.PlatformController = void 0;
+exports.PlatformMailTestController = exports.PlatformAdminsController = exports.PlatformController = void 0;
+exports.checkMailTestRateLimit = checkMailTestRateLimit;
+exports.resetMailTestRateLimit = resetMailTestRateLimit;
 const common_1 = require("@nestjs/common");
 const platform_service_1 = require("./platform.service");
+const notifications_service_1 = require("../notifications/notifications.service");
 const passport_1 = require("@nestjs/passport");
 const roles_guard_1 = require("../auth/roles.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
@@ -204,3 +207,57 @@ exports.PlatformAdminsController = PlatformAdminsController = __decorate([
     (0, roles_decorator_1.Roles)('platform_super_admin'),
     __metadata("design:paramtypes", [platform_service_1.PlatformService])
 ], PlatformAdminsController);
+const mailTestRateMap = new Map();
+function checkMailTestRateLimit(key) {
+    const now = Date.now();
+    const windowMs = 60 * 60 * 1000;
+    const timestamps = mailTestRateMap.get(key) || [];
+    const validTimestamps = timestamps.filter((t) => now - t < windowMs);
+    if (validTimestamps.length >= 5) {
+        return false;
+    }
+    validTimestamps.push(now);
+    mailTestRateMap.set(key, validTimestamps);
+    return true;
+}
+function resetMailTestRateLimit(key) {
+    if (key) {
+        mailTestRateMap.delete(key);
+    }
+    else {
+        mailTestRateMap.clear();
+    }
+}
+let PlatformMailTestController = class PlatformMailTestController {
+    constructor(notificationsService) {
+        this.notificationsService = notificationsService;
+    }
+    async sendMailTest(user, req) {
+        const userEmail = user?.email;
+        if (!userEmail) {
+            throw new common_1.BadRequestException('Signed-in user email is required to send test email');
+        }
+        const key = user?.id || req?.ip || 'anonymous';
+        if (!checkMailTestRateLimit(key)) {
+            throw new common_1.HttpException('Rate limit exceeded: maximum 5 test emails per hour', common_1.HttpStatus.TOO_MANY_REQUESTS);
+        }
+        const reqId = req?.headers?.['x-request-id'] || req?.id;
+        return this.notificationsService.sendTestMail(userEmail, reqId);
+    }
+};
+exports.PlatformMailTestController = PlatformMailTestController;
+__decorate([
+    (0, common_1.Post)('mail-test'),
+    (0, roles_decorator_1.Roles)('platform_super_admin'),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], PlatformMailTestController.prototype, "sendMailTest", null);
+exports.PlatformMailTestController = PlatformMailTestController = __decorate([
+    (0, common_1.Controller)('platform'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('platform_super_admin'),
+    __metadata("design:paramtypes", [notifications_service_1.NotificationsService])
+], PlatformMailTestController);

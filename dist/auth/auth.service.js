@@ -379,12 +379,6 @@ let AuthService = class AuthService {
             await this._addArtificialDelay();
             return { message: 'If that email exists, a reset link has been sent.' };
         }
-        await this.prisma.passwordResetToken
-            .updateMany({
-            where: { userId: user.id, usedAt: null },
-            data: { usedAt: new Date() },
-        })
-            .catch(() => { });
         const rawToken = crypto.randomBytes(32).toString('hex');
         const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -444,8 +438,8 @@ let AuthService = class AuthService {
                     lockoutUntil: null,
                 },
             }),
-            this.prisma.passwordResetToken.update({
-                where: { id: record.id },
+            this.prisma.passwordResetToken.updateMany({
+                where: { userId: record.userId, usedAt: null },
                 data: { usedAt: new Date() },
             }),
             this.prisma.refreshSession.updateMany({

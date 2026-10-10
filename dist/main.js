@@ -39,12 +39,19 @@ const express_1 = require("express");
 const helmet_1 = require("helmet");
 const cookieParser = require("cookie-parser");
 const cors_config_1 = require("./common/cors-config");
+const url_util_1 = require("./common/url.util");
 const request_id_middleware_1 = require("./common/request-id.middleware");
 const http_exception_filter_1 = require("./common/http-exception.filter");
 const sanitize_response_interceptor_1 = require("./common/sanitize-response.interceptor");
 const cache_control_interceptor_1 = require("./common/cache-control.interceptor");
 const trust_proxy_util_1 = require("./common/trust-proxy.util");
 async function bootstrap() {
+    const nodeEnv = process.env.NODE_ENV || 'development';
+    const mailProvider = (process.env.MAIL_PROVIDER || 'smtp').trim().toLowerCase();
+    const corsOriginsCount = (0, cors_config_1.getCorsOriginsCount)();
+    const corsHosts = (0, cors_config_1.getAllowedCorsHosts)();
+    const dbProjectRef = (0, url_util_1.getDatabaseProjectRef)();
+    console.log(`Startup Config | NODE_ENV: ${nodeEnv} | Mail Provider: ${mailProvider} | CORS Origins Count: ${corsOriginsCount} | Allowed CORS Hosts: [${corsHosts.join(', ')}] | DB Project Ref: ${dbProjectRef}`);
     const dbUrl = process.env.DATABASE_URL || '';
     const match = dbUrl.match(/postgresql:\/\/[^@]+@([^/:]+)[:\/](.+?)(?:\?|$)/);
     if (match) {

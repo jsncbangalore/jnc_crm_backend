@@ -19,7 +19,7 @@ exports.PlatformModule = PlatformModule;
 exports.PlatformModule = PlatformModule = __decorate([
     (0, common_1.Module)({
         imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule, notifications_module_1.NotificationsModule],
-        controllers: [platform_controller_1.PlatformController, platform_controller_1.PlatformAdminsController],
+        controllers: [platform_controller_1.PlatformController, platform_controller_1.PlatformAdminsController, platform_controller_1.PlatformMailTestController],
         providers: [platform_service_1.PlatformService],
         exports: [platform_service_1.PlatformService],
     })

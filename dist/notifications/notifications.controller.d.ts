@@ -22,8 +22,8 @@ export declare class NotificationsController {
         total: number;
     }>;
     syncGoDaddy(user: ScopedUser): Promise<{
-        message: string;
-        count: number;
+        success: boolean;
+        syncedCount: number;
     }>;
     handleInboundEmail(body: {
         from: string;
