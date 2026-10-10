@@ -157,12 +157,14 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
             if (configuredFrom && !configuredFrom.toLowerCase().includes('@gmail.com')) {
                 fromAddr = configuredFrom.includes('<') ? configuredFrom : `"${displayName || 'JNC CRM'}" <${configuredFrom}>`;
             }
+            const replyTo = process.env.REPLY_TO || process.env.EMAIL_FROM || 'jsnccrm@gmail.com';
             const payload = JSON.stringify({
                 from: fromAddr,
                 to: Array.isArray(options.to) ? options.to : [options.to],
                 subject: options.subject,
                 html: options.html || undefined,
                 text: options.text || undefined,
+                reply_to: replyTo,
             });
             const req = https.request({
                 hostname: 'api.resend.com',
